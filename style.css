@@ -1,6 +1,6 @@
 body {
     /* Remplacez l'URL par le lien de votre image de garage ou le chemin vers votre fichier local */
-    background-image: url("Garage.png");
+    background-image: url("Garage.jpg");
     
     /* Empêche l'image de se répéter en mosaïque */
     background-repeat: no-repeat;
