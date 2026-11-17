@@ -1,20 +1,33 @@
 body {
-    /* Remplacez l'URL par le lien de votre image de garage ou le chemin vers votre fichier local */
+    /* Ton image de garage en arrière-plan */
     background-image: url("Garage.jpg");
-    
-    /* Empêche l'image de se répéter en mosaïque */
     background-repeat: no-repeat;
-    
-    /* Centre l'image sur l'écran */
     background-position: center center;
-    
-    /* Étire l'image pour qu'elle couvre tout l'arrière-plan sans déformation */
     background-size: cover;
-    
-    /* Fixe l'image pour qu'elle ne bouge pas quand on fait défiler la page */
     background-attachment: fixed;
     
-    /* Une hauteur minimale pour que le body prenne tout l'écran */
+    /* Hauteur et marges */
     height: 100vh;
     margin: 0;
+    
+    /* Ajouté pour centrer le titre au milieu de l'écran par-dessus l'image */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Style de ton titre au milieu avec dégradé rouge */
+h1 {
+    font-size: 3.5rem;
+    font-weight: bold;
+    text-align: center;
+    
+    /* Dégradé de rouge */
+    background: linear-gradient(90deg, #ff4d4d, #b30000, #4d0000);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    
+    /* Petite ombre portée pour qu'il ressorte bien par-dessus l'image de ton garage */
+    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.7));
 }
