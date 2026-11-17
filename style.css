@@ -1,33 +1,95 @@
 body {
-    /* Ton image de garage en arrière-plan */
     background-image: url("Garage.jpg");
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
     background-attachment: fixed;
-    
-    /* Hauteur et marges */
     height: 100vh;
     margin: 0;
-    
-    /* Ajouté pour centrer le titre au milieu de l'écran par-dessus l'image */
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* Style de ton titre au milieu avec dégradé rouge */
 h1 {
-    font-size: 3.5rem;
+    position: relative;
+    font-size: 4rem;
     font-weight: bold;
     text-align: center;
+    cursor: pointer; /* Change le curseur en main au survol */
+    user-select: none;
     
-    /* Dégradé de rouge */
+    /* Dégradé de rouge de base */
     background: linear-gradient(90deg, #ff4d4d, #b30000, #4d0000);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     
-    /* Petite ombre portée pour qu'il ressorte bien par-dessus l'image de ton garage */
+    /* Ombre de base */
     filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.7));
+    transition: transform 0.2s ease;
+}
+
+/* --- EFFET AU SURVOL (HOVER) --- */
+h1:hover {
+    transform: scale(1.05); /* Léger zoom dynamique */
+    /* Dégradé plus lumineux (rouge néon vers blanc) */
+    background: linear-gradient(90deg, #ffffff, #ff4d4d, #ff0000);
+    -webkit-background-clip: text;
+    background-clip: text;
+    
+    /* Déclenche l'animation de flash électrique */
+    animation: electric-glow 0.4s infinite alternate;
+}
+
+/* Création des éclairs autour du titre au survol */
+h1:hover::before,
+h1:hover::after {
+    content: "";
+    position: absolute;
+    top: -30%;
+    left: -10%;
+    width: 120%;
+    height: 160%;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    /* Éclair dessinés en SVG intégré directement dans le CSS */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'%3E%3Cpath d='M10,40 L45,25 L40,45 L85,15 L75,40 L120,20 L110,50 L160,10 L150,35 L190,30' fill='none' stroke='%2300f2ff' stroke-width='2'/%3E%3Cpath d='M20,60 L60,50 L55,65 L110,40 L100,60 L155,45 L180,65' fill='none' stroke='%23ffffff' stroke-width='1.5'/%3E%3C/svg%3E");
+    filter: drop-shadow(0 0 8px #00f2ff) drop-shadow(0 0 15px #ff0000);
+    animation: lightning-flash 0.25s steps(2, end) infinite;
+}
+
+h1:hover::after {
+    transform: scaleX(-1) scaleY(-1); /* Inverse le deuxième éclair pour varier */
+    animation-delay: 0.12s;
+}
+
+/* Animation de l'illumination du texte */
+@keyframes electric-glow {
+    0% {
+        filter: drop-shadow(0 0 5px #ff1a1a) drop-shadow(0 0 15px #ff0000);
+    }
+    50% {
+        filter: drop-shadow(0 0 12px #ffffff) drop-shadow(0 0 25px #00f2ff) drop-shadow(0 0 40px #ff0000);
+    }
+    100% {
+        filter: drop-shadow(0 0 8px #ff4d4d) drop-shadow(0 0 20px #00f2ff);
+    }
+}
+
+/* Animation de clignotement rapide des arcs électriques */
+@keyframes lightning-flash {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0) scale(0.98);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-2px, 2px) scale(1.02);
+    }
+    100% {
+        opacity: 0.2;
+        transform: translate(2px, -2px) scale(1);
+    }
 }
