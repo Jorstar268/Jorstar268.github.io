@@ -1,0 +1,20 @@
+body {
+    /* Remplacez l'URL par le lien de votre image de garage ou le chemin vers votre fichier local */
+    background-image: url("C:\Users\jorlu\OneDrive\Desktop\Projet de Prog Web");
+    
+    /* Empêche l'image de se répéter en mosaïque */
+    background-repeat: no-repeat;
+    
+    /* Centre l'image sur l'écran */
+    background-position: center center;
+    
+    /* Étire l'image pour qu'elle couvre tout l'arrière-plan sans déformation */
+    background-size: cover;
+    
+    /* Fixe l'image pour qu'elle ne bouge pas quand on fait défiler la page */
+    background-attachment: fixed;
+    
+    /* Une hauteur minimale pour que le body prenne tout l'écran */
+    height: 100vh;
+    margin: 0;
+}
