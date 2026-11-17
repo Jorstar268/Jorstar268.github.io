@@ -38,48 +38,50 @@ h1:hover {
     animation: electric-glow 0.4s infinite alternate;
 }
 
-/* Éclair à GAUCHE du titre */
+/* Éclair ROUGE à GAUCHE du titre */
 h1:hover::before {
     content: "";
     position: absolute;
     top: 50%;
-    left: -130px; /* Éloigne l'éclair à gauche du texte */
+    left: -130px;
     transform: translateY(-50%);
     width: 100px;
     height: 120px;
     pointer-events: none;
     background-repeat: no-repeat;
     background-size: contain;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M100,10 L40,110 L90,110 L70,190 L160,80 L110,80 L140,10 Z' fill='%2300f2ff' stroke='%23ffffff' stroke-width='4'/%3E%3C/svg%3E");
-    filter: drop-shadow(0 0 10px #00f2ff) drop-shadow(0 0 20px #ff0000);
+    /* Couleur rouge vif (%23ff1a1a) avec contour blanc */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M100,10 L40,110 L90,110 L70,190 L160,80 L110,80 L140,10 Z' fill='%23ff1a1a' stroke='%23ffffff' stroke-width='4'/%3E%3C/svg%3E");
+    filter: drop-shadow(0 0 10px #ff1a1a) drop-shadow(0 0 20px #990000);
     animation: lightning-flash 0.2s steps(2, end) infinite;
 }
 
-/* Éclair à DROITE du titre */
+/* Éclair ROUGE à DROITE du titre */
 h1:hover::after {
     content: "";
     position: absolute;
     top: 50%;
-    right: -130px; /* Éloigne l'éclair à droite du texte */
-    transform: translateY(-50%) scaleX(-1); /* Effet miroir pour varier */
+    right: -130px;
+    transform: translateY(-50%) scaleX(-1);
     width: 100px;
     height: 120px;
     pointer-events: none;
     background-repeat: no-repeat;
     background-size: contain;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M100,10 L40,110 L90,110 L70,190 L160,80 L110,80 L140,10 Z' fill='%2300f2ff' stroke='%23ffffff' stroke-width='4'/%3E%3C/svg%3E");
-    filter: drop-shadow(0 0 10px #00f2ff) drop-shadow(0 0 20px #ff0000);
+    /* Couleur rouge vif (%23ff1a1a) avec contour blanc */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M100,10 L40,110 L90,110 L70,190 L160,80 L110,80 L140,10 Z' fill='%23ff1a1a' stroke='%23ffffff' stroke-width='4'/%3E%3C/svg%3E");
+    filter: drop-shadow(0 0 10px #ff1a1a) drop-shadow(0 0 20px #990000);
     animation: lightning-flash 0.25s steps(2, end) infinite;
     animation-delay: 0.1s;
 }
 
-/* Animation de l'illumination du texte */
+/* Animation de l'illumination rouge du texte */
 @keyframes electric-glow {
     0% {
-        filter: drop-shadow(0 0 5px #ff1a1a) drop-shadow(0 0 15px #ff0000);
+        filter: drop-shadow(0 0 5px #ff1a1a) drop-shadow(0 0 15px #800000);
     }
     100% {
-        filter: drop-shadow(0 0 15px #ffffff) drop-shadow(0 0 30px #00f2ff);
+        filter: drop-shadow(0 0 15px #ff6666) drop-shadow(0 0 30px #ff0000);
     }
 }
 
