@@ -16,7 +16,7 @@ h1 {
     font-size: 4rem;
     font-weight: bold;
     text-align: center;
-    cursor: pointer; /* Change le curseur en main au survol */
+    cursor: pointer;
     user-select: none;
     
     /* Dégradé de rouge de base */
@@ -25,44 +25,52 @@ h1 {
     background-clip: text;
     color: transparent;
     
-    /* Ombre de base */
     filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.7));
     transition: transform 0.2s ease;
 }
 
 /* --- EFFET AU SURVOL (HOVER) --- */
 h1:hover {
-    transform: scale(1.05); /* Léger zoom dynamique */
-    /* Dégradé plus lumineux (rouge néon vers blanc) */
+    transform: scale(1.05);
     background: linear-gradient(90deg, #ffffff, #ff4d4d, #ff0000);
     -webkit-background-clip: text;
     background-clip: text;
-    
-    /* Déclenche l'animation de flash électrique */
     animation: electric-glow 0.4s infinite alternate;
 }
 
-/* Création des éclairs autour du titre au survol */
-h1:hover::before,
+/* Éclair à GAUCHE du titre */
+h1:hover::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -130px; /* Éloigne l'éclair à gauche du texte */
+    transform: translateY(-50%);
+    width: 100px;
+    height: 120px;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M100,10 L40,110 L90,110 L70,190 L160,80 L110,80 L140,10 Z' fill='%2300f2ff' stroke='%23ffffff' stroke-width='4'/%3E%3C/svg%3E");
+    filter: drop-shadow(0 0 10px #00f2ff) drop-shadow(0 0 20px #ff0000);
+    animation: lightning-flash 0.2s steps(2, end) infinite;
+}
+
+/* Éclair à DROITE du titre */
 h1:hover::after {
     content: "";
     position: absolute;
-    top: -30%;
-    left: -10%;
-    width: 120%;
-    height: 160%;
+    top: 50%;
+    right: -130px; /* Éloigne l'éclair à droite du texte */
+    transform: translateY(-50%) scaleX(-1); /* Effet miroir pour varier */
+    width: 100px;
+    height: 120px;
     pointer-events: none;
     background-repeat: no-repeat;
-    background-size: 100% 100%;
-    /* Éclair dessinés en SVG intégré directement dans le CSS */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'%3E%3Cpath d='M10,40 L45,25 L40,45 L85,15 L75,40 L120,20 L110,50 L160,10 L150,35 L190,30' fill='none' stroke='%2300f2ff' stroke-width='2'/%3E%3Cpath d='M20,60 L60,50 L55,65 L110,40 L100,60 L155,45 L180,65' fill='none' stroke='%23ffffff' stroke-width='1.5'/%3E%3C/svg%3E");
-    filter: drop-shadow(0 0 8px #00f2ff) drop-shadow(0 0 15px #ff0000);
+    background-size: contain;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M100,10 L40,110 L90,110 L70,190 L160,80 L110,80 L140,10 Z' fill='%2300f2ff' stroke='%23ffffff' stroke-width='4'/%3E%3C/svg%3E");
+    filter: drop-shadow(0 0 10px #00f2ff) drop-shadow(0 0 20px #ff0000);
     animation: lightning-flash 0.25s steps(2, end) infinite;
-}
-
-h1:hover::after {
-    transform: scaleX(-1) scaleY(-1); /* Inverse le deuxième éclair pour varier */
-    animation-delay: 0.12s;
+    animation-delay: 0.1s;
 }
 
 /* Animation de l'illumination du texte */
@@ -70,26 +78,23 @@ h1:hover::after {
     0% {
         filter: drop-shadow(0 0 5px #ff1a1a) drop-shadow(0 0 15px #ff0000);
     }
-    50% {
-        filter: drop-shadow(0 0 12px #ffffff) drop-shadow(0 0 25px #00f2ff) drop-shadow(0 0 40px #ff0000);
-    }
     100% {
-        filter: drop-shadow(0 0 8px #ff4d4d) drop-shadow(0 0 20px #00f2ff);
+        filter: drop-shadow(0 0 15px #ffffff) drop-shadow(0 0 30px #00f2ff);
     }
 }
 
-/* Animation de clignotement rapide des arcs électriques */
+/* Animation de clignotement des éclairs latéraux */
 @keyframes lightning-flash {
     0% {
-        opacity: 0;
-        transform: translate(0, 0) scale(0.98);
+        opacity: 0.2;
+        transform: translateY(-50%) scale(0.9);
     }
     50% {
         opacity: 1;
-        transform: translate(-2px, 2px) scale(1.02);
+        transform: translateY(-50%) scale(1.1) rotate(5deg);
     }
     100% {
-        opacity: 0.2;
-        transform: translate(2px, -2px) scale(1);
+        opacity: 0.4;
+        transform: translateY(-50%) scale(1) rotate(-5deg);
     }
 }
