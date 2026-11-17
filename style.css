@@ -1,6 +1,6 @@
 body {
     /* Remplacez l'URL par le lien de votre image de garage ou le chemin vers votre fichier local */
-    background-image: url("C:\Users\jorlu\OneDrive\Desktop\Projet de Prog Web");
+    background-image: url("\\wsl.localhost\Debian\home\JORSTAR\Jorstar268.github.io");
     
     /* Empêche l'image de se répéter en mosaïque */
     background-repeat: no-repeat;
