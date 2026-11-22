@@ -58,7 +58,7 @@ title.addEventListener("click", () => {
 // --- LOGIQUE : MAGASIN, AMÉLIORATIONS & 5 DIFFICULTÉS ---
 // =========================================================
 
-let money = 500;
+let money = 5000;
 
 const weapons = [
     {
