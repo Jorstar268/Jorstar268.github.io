@@ -183,21 +183,25 @@
         const loader = new GLTFLoader();
         const modelCache = new Map();
 
-       let scene, camera, renderer, weaponPivot, weaponModelPivot;
+        let scene, camera, renderer, weaponPivot, weaponModelPivot;
         let currentWeaponModel = null;
         let activeWeaponId = null;
         let loadToken = 0;
+
+        // Axe Y (rot[1]) : tourne horizontalement l'arme
+        // Axe X (rot[0]) : lève ou baisse l'avant de l'arme
+        // Axe Z (rot[2]) : penche l'arme sur le côté
         const weapon3DConfigs = {
             barre_fer:            { file: "Bare de Fer.glb",            scale: 1.35, pos: [0.16, -0.24, -0.58], rot: [0.12, -Math.PI / 2, 0.08] },
-            pistolet_9mm:         { file: "Pistolet.glb",               scale: 1.05, pos: [0.16, -0.21, -0.58], rot: [0.0, -Math.PI / 2, 0.0] },
+            pistolet_9mm:         { file: "Pistolet.glb",               scale: 1.05, pos: [0.16, -0.21, -0.58], rot: [0.0,  -Math.PI / 2, 0.0] },
             revolver_357:         { file: "Revolver.glb",               scale: 1.05, pos: [0.17, -0.21, -0.56], rot: [0.05, -Math.PI / 2, 0.0] },
-            fusil_pompe:          { file: "Fusil a pompe.glb",          scale: 1.15, pos: [0.20, -0.23, -0.52], rot: [0.0, -Math.PI / 2, 0.0] },
-            pistolet_mitrailleur: { file: "Pistolet-mitrailleur.glb", scale: 1.10, pos: [0.20, -0.22, -0.55], rot: [0.0, -Math.PI / 2, 0.0] },
-            fusil_assaut:         { file: "Fusil d'assaut.glb",         scale: 1.15, pos: [0.20, -0.23, -0.54], rot: [0.0, -Math.PI / 2, 0.0] },
-            fusil_precision:      { file: "Sniper.glb",                 scale: 1.20, pos: [0.21, -0.24, -0.55], rot: [0.0, -Math.PI / 2, 0.0] },
-            mitrailleuse_lourde:  { file: "Sniper lourde.glb",          scale: 1.20, pos: [0.22, -0.25, -0.56], rot: [0.0, -Math.PI / 2, 0.0] },
-            lance_roquettes:      { file: "Lance Roquet.glb",           scale: 1.15, pos: [0.22, -0.23, -0.58], rot: [0.0, -Math.PI / 2, 0.0] },
-            grenade:              { file: "Grenade.glb",                scale: 0.6,  pos: [0.20, -0.24, -0.62], rot: [0.0, Math.PI, 0.0] }
+            fusil_pompe:          { file: "Fusil a pompe.glb",          scale: 1.15, pos: [0.20, -0.23, -0.52], rot: [0.0,  -Math.PI / 2, 0.0] },
+            pistolet_mitrailleur: { file: "Pistolet-mitrailleur.glb", scale: 1.10, pos: [0.20, -0.22, -0.55], rot: [0.0,  -Math.PI / 2, 0.0] },
+            fusil_assaut:         { file: "Fusil d'assaut.glb",         scale: 1.15, pos: [0.20, -0.23, -0.54], rot: [0.0,  -Math.PI / 2, 0.0] },
+            fusil_precision:      { file: "Sniper.glb",                 scale: 1.20, pos: [0.21, -0.24, -0.55], rot: [0.0,  -Math.PI / 2, 0.0] },
+            mitrailleuse_lourde:  { file: "Sniper lourde.glb",          scale: 1.20, pos: [0.22, -0.25, -0.56], rot: [0.0,  -Math.PI / 2, 0.0] },
+            lance_roquettes:      { file: "Lance Roquet.glb",           scale: 1.15, pos: [0.22, -0.23, -0.58], rot: [0.0,  -Math.PI / 2, 0.0] },
+            grenade:              { file: "Grenade.glb",                scale: 0.60, pos: [0.20, -0.24, -0.62], rot: [0.0,   Math.PI,      0.0] }
         };
 
         const animState = {
@@ -251,14 +255,12 @@
             scene.add(rimLight);
 
             weaponPivot = new THREE.Group();
+            weaponModelPivot = new THREE.Group();
+            weaponPivot.add(weaponModelPivot);
             scene.add(weaponPivot);
 
             window.addEventListener("resize", handleResize);
             requestAnimationFrame(animate);
-            weaponPivot = new THREE.Group();
-            weaponModelPivot = new THREE.Group();
-            weaponPivot.add(weaponModelPivot);
-            scene.add(weaponPivot);
         }
 
         function normalizeModelToView(root) {
@@ -299,33 +301,6 @@
         async function setWeapon(weaponId) {
             initScene();
             handleResize();
-            if (!weaponPivot) return;
-
-            activeWeaponId = weaponId;
-            const token = ++loadToken;
-            const cfg = weapon3DConfigs[weaponId] || weapon3DConfigs.barre_fer;
-
-            if (currentWeaponModel) {
-                weaponPivot.remove(currentWeaponModel);
-                currentWeaponModel = null;
-            }
-
-            weaponPivot.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
-            weaponPivot.rotation.set(cfg.rot[0], cfg.rot[1], cfg.rot[2]);
-
-            try {
-                const model = await loadGlbCached(cfg.file);
-                if (token !== loadToken || activeWeaponId !== weaponId) return;
-
-                model.scale.multiplyScalar(cfg.scale || 1);
-                currentWeaponModel = model;
-                weaponPivot.add(currentWeaponModel);
-            } catch (err) {
-                console.warn(`Impossible de charger le modèle 3D "${cfg.file}" :`, err);
-            }
-            async function setWeapon(weaponId) {
-            initScene();
-            handleResize();
             if (!weaponPivot || !weaponModelPivot) return;
 
             activeWeaponId = weaponId;
@@ -350,7 +325,6 @@
             } catch (err) {
                 console.warn(`Impossible de charger le modèle 3D "${cfg.file}" :`, err);
             }
-        }
         }
 
         function animate() {
@@ -382,9 +356,9 @@
             );
 
             weaponPivot.rotation.set(
-                cfg.rot[0] + animState.recoilPitch + animState.reloadTilt,
-                cfg.rot[1] - animState.swayX * 0.4,
-                cfg.rot[2]
+                animState.recoilPitch + animState.reloadTilt,
+                -animState.swayX * 0.4,
+                0
             );
 
             renderer.render(scene, camera);
@@ -408,6 +382,5 @@
             }
         };
     </script>
-    <script src="script.js"></script>
 </body>
 </html>
