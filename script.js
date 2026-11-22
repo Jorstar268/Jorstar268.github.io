@@ -881,19 +881,84 @@ function triggerHealAction() {
         combatStatusBadge.textContent = "Vie déjà au maximum";
     }
 }
+const moveKeysPressed = { z: false, q: false, s: false, d: false };
+let moveLoopInterval = null;
+let playerPosX = 0;
+let playerPosZ = 0;
 
-function triggerMoveDirection(dir, pressed) {
+function updatePlayerMovementStep() {
     if (!inCombat || isPaused) return;
+
+    const speed = 0.22;
+    let dx = 0;
+    let dz = 0;
+
+    if (moveKeysPressed.z) dz += speed;
+    if (moveKeysPressed.s) dz -= speed;
+    if (moveKeysPressed.q) dx -= speed;
+    if (moveKeysPressed.d) dx += speed;
+
+    if (dx === 0 && dz === 0) return;
+
+    // Normalise les déplacements en diagonale pour ne pas aller plus vite
+    if (dx !== 0 && dz !== 0) {
+        const inv = 1 / Math.SQRT2;
+        dx *= inv;
+        dz *= inv;
+    }
+
+    playerPosX += dx;
+    playerPosZ += dz;
+
+    // Déplace visuellement l'arrière-plan de la zone de combat selon la position
+    const bgX = 50 + lookYaw * 0.25 - playerPosX * 1.4;
+    const bgY = 50 + lookPitch * 0.25 + playerPosZ * 1.1;
+    combatViewLayer.style.backgroundPosition = `${bgX}% ${bgY}%`;
+
+    if (window.fps3D && typeof window.fps3D.setMoveOffset === "function") {
+        window.fps3D.setMoveOffset(playerPosX, playerPosZ);
+    }
+}
+
+function startMoveLoop() {
+    if (moveLoopInterval) return;
+    moveLoopInterval = setInterval(updatePlayerMovementStep, 30);
+}
+
+function stopMoveLoop() {
+    clearInterval(moveLoopInterval);
+    moveLoopInterval = null;
+}function triggerMoveDirection(dir, pressed) {
+    if (!["z", "q", "s", "d"].includes(dir)) return;
+
+    if (!inCombat || isPaused) {
+        moveKeysPressed[dir] = false;
+        const btn = document.querySelector(`.move-key[data-move="${dir}"]`);
+        if (btn) btn.classList.remove("pressed");
+        return;
+    }
+
+    moveKeysPressed[dir] = Boolean(pressed);
+
     const btn = document.querySelector(`.move-key[data-move="${dir}"]`);
     if (btn) {
-        btn.classList.toggle("pressed", pressed);
+        btn.classList.toggle("pressed", moveKeysPressed[dir]);
     }
+
+    const anyMoving = Object.values(moveKeysPressed).some(Boolean);
     if (window.fps3D) {
-        window.fps3D.setMoving(pressed);
+        window.fps3D.setMoving(anyMoving);
     }
+
+    if (anyMoving) {
+        startMoveLoop();
+    } else {
+        stopMoveLoop();
+    }
+
     if (pressed) {
         const labels = { z: "Avance (Z)", s: "Recule (S)", q: "Gauche (Q)", d: "Droite (D)" };
-        combatStatusBadge.textContent = `Déplacement : ${labels[dir] || dir}`;
+        combatStatusBadge.textContent = `Déplacement : ${labels[dir]} (X: ${playerPosX.toFixed(1)}, Z: ${playerPosZ.toFixed(1)})`;
     }
 }
 
@@ -935,6 +1000,8 @@ function stopContinuousFire() {
 }
 
 function togglePauseGame(forcePause = null) {
+    stopMoveLoop();
+    moveKeysPressed.z = moveKeysPressed.q = moveKeysPressed.s = moveKeysPressed.d = false;
     stopContinuousFire();
     if (!inCombat) return;
     const nextState = forcePause !== null ? forcePause : !isPaused;
@@ -1047,4 +1114,21 @@ document.addEventListener("keyup", e => {
     if (["z", "q", "s", "d"].includes(key)) {
         triggerMoveDirection(key, false);
     }
+});
+window.addEventListener("mouseup", e => {
+    if (e.button === 0) {
+        stopContinuousFire();
+        ["z", "q", "s", "d"].forEach(dir => triggerMoveDirection(dir, false));
+    }
+});
+
+window.addEventListener("touchend", () => {
+    stopContinuousFire();
+    ["z", "q", "s", "d"].forEach(dir => triggerMoveDirection(dir, false));
+});
+
+window.addEventListener("blur", () => {
+    stopContinuousFire();
+    stopMoveLoop();
+    ["z", "q", "s", "d"].forEach(dir => triggerMoveDirection(dir, false));
 });
