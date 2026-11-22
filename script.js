@@ -602,7 +602,6 @@ function renderDifficultyCases() {
         grid.appendChild(box);
     });
 }
-
 // =========================================================
 // --- TRANSITION 20 RECTANGLES, COMBAT & PAUSE / ZOMBIES ---
 // =========================================================
@@ -712,6 +711,7 @@ function startCombatWithRectangles(diff) {
     lookPitch = 0;
     isPaused = false;
     isReloading = false;
+    stopContinuousFire();
 
     initMatchAmmo();
     combatEarnedMoneyEl.textContent = earnedInMatch;
@@ -819,6 +819,7 @@ function triggerShootAction(hitZombie = false) {
 
 function triggerReloadAction() {
     if (!inCombat || isPaused || isReloading) return;
+    stopContinuousFire();
     const equipped = weapons.find(w => w.id === equippedWeaponId) || weapons[0];
     const maxAmmo = getCurrentWeaponMaxAmmo(equipped);
     const curAmmo = getCurrentWeaponAmmo(equipped);
@@ -849,6 +850,8 @@ function triggerReloadAction() {
 
 function triggerSwitchWeaponAction() {
     if (!inCombat || isPaused) return;
+    const wasHolding = isHoldingFire;
+    stopContinuousFire();
     const owned = weapons.filter(w => w.owned);
     if (owned.length > 1) {
         const idx = owned.findIndex(w => w.id === equippedWeaponId);
@@ -856,6 +859,9 @@ function triggerSwitchWeaponAction() {
         equippedWeaponId = nextWeapon.id;
         syncCombatWeaponView();
         combatStatusBadge.textContent = `Arme sélectionnée : ${nextWeapon.name}`;
+        if (wasHolding) {
+            startContinuousFire(false);
+        }
     } else {
         combatStatusBadge.textContent = "Aucune autre arme possédée pour l'instant";
     }
@@ -891,13 +897,18 @@ function triggerMoveDirection(dir, pressed) {
     }
 }
 
+function getFireIntervalMs(weapon) {
+    const s = getStatsAtLevel(weapon, weapon.level);
+    const rate = Math.max(0.2, Number(s.fireRate) || 1);
+    return 1000 / rate;
+}
+
 function startContinuousFire(hitZombie = false) {
     if (!inCombat || isPaused || isReloading) return;
     isHoldingFire = true;
 
     const equipped = weapons.find(w => w.id === equippedWeaponId) || weapons[0];
-    const s = getStatsAtLevel(equipped, equipped.level);
-    const delayMs = 1000 / Math.max(0.2, Number(s.fireRate) || 1);
+    const delayMs = getFireIntervalMs(equipped);
 
     triggerShootAction(hitZombie);
 
@@ -907,7 +918,8 @@ function startContinuousFire(hitZombie = false) {
             stopContinuousFire();
             return;
         }
-        if (getCurrentWeaponAmmo(equipped) <= 0) {
+        const currentEquipped = weapons.find(w => w.id === equippedWeaponId) || weapons[0];
+        if (getCurrentWeaponAmmo(currentEquipped) <= 0) {
             stopContinuousFire();
             combatStatusBadge.textContent = "Chargeur vide ! Appuyez sur RELOAD ou clic droit.";
             return;
@@ -923,6 +935,7 @@ function stopContinuousFire() {
 }
 
 function togglePauseGame(forcePause = null) {
+    stopContinuousFire();
     if (!inCombat) return;
     const nextState = forcePause !== null ? forcePause : !isPaused;
     isPaused = nextState;
@@ -933,12 +946,9 @@ function togglePauseGame(forcePause = null) {
         combatStatusBadge.textContent = `Reprise — Vague ${currentWave}/${totalWaves}`;
     }
 }
-let isHoldingFire = false;
-let autoFireInterval = null;
-
-
 
 function quitCombatSession() {
+    stopContinuousFire();
     if (!inCombat && combatScreen.classList.contains("hidden")) return;
     inCombat = false;
     isPaused = false;
@@ -959,7 +969,15 @@ document.getElementById("btn-stop-game").addEventListener("click", () => toggleP
 document.getElementById("btn-resume-game").addEventListener("click", () => togglePauseGame(false));
 document.getElementById("btn-quit-game").addEventListener("click", quitCombatSession);
 
-document.getElementById("btn-combat-shoot").addEventListener("click", () => triggerShootAction(false));
+const shootBtnEl = document.getElementById("btn-combat-shoot");
+shootBtnEl.addEventListener("mousedown", e => {
+    if (e.button === 0) startContinuousFire(false);
+});
+shootBtnEl.addEventListener("touchstart", e => {
+    e.preventDefault();
+    startContinuousFire(false);
+});
+
 document.getElementById("btn-combat-reload").addEventListener("click", triggerReloadAction);
 document.getElementById("btn-combat-switch").addEventListener("click", triggerSwitchWeaponAction);
 document.getElementById("btn-combat-heal").addEventListener("click", triggerHealAction);
@@ -967,7 +985,7 @@ document.getElementById("btn-combat-heal").addEventListener("click", triggerHeal
 zombieTargetBtn.addEventListener("mousedown", e => {
     e.stopPropagation();
     if (e.button === 0) {
-        triggerShootAction(true);
+        startContinuousFire(true);
     }
 });
 
@@ -983,7 +1001,7 @@ document.querySelectorAll(".move-key").forEach(btn => {
     btn.addEventListener("touchend", () => triggerMoveDirection(dir, false));
 });
 
-// Souris & clics en combat : mouvement de visée, clic gauche = tirer, clic droit = recharger
+// Souris & clics en combat : mouvement de visée, clic gauche = tirer en continu, clic droit = recharger
 combatViewLayer.addEventListener("mousemove", e => {
     if (!inCombat || isPaused) return;
     lookYaw += e.movementX * 0.18;
@@ -994,11 +1012,17 @@ combatViewLayer.addEventListener("mousemove", e => {
 combatViewLayer.addEventListener("mousedown", e => {
     if (!inCombat || isPaused) return;
     if (e.button === 0) {
-        triggerShootAction(false);
+        startContinuousFire(false);
     } else if (e.button === 2) {
         triggerReloadAction();
     }
 });
+
+window.addEventListener("mouseup", e => {
+    if (e.button === 0) stopContinuousFire();
+});
+window.addEventListener("touchend", stopContinuousFire);
+window.addEventListener("blur", stopContinuousFire);
 
 combatViewLayer.addEventListener("contextmenu", e => {
     if (inCombat) e.preventDefault();
@@ -1024,39 +1048,3 @@ document.addEventListener("keyup", e => {
         triggerMoveDirection(key, false);
     }
 });
-function getFireIntervalMs(weapon) {
-    const s = getStatsAtLevel(weapon, weapon.level);
-    const rate = Math.max(0.2, Number(s.fireRate) || 1);
-    return 1000 / rate;
-}
-
-function startContinuousFire(hitZombie = false) {
-    if (!inCombat || isPaused || isReloading) return;
-    isHoldingFire = true;
-
-    triggerShootAction(hitZombie);
-
-    clearInterval(autoFireInterval);
-    const equipped = weapons.find(w => w.id === equippedWeaponId) || weapons[0];
-    const delayMs = getFireIntervalMs(equipped);
-
-    autoFireInterval = setInterval(() => {
-        if (!inCombat || isPaused || isReloading || !isHoldingFire) {
-            stopContinuousFire();
-            return;
-        }
-        const curAmmo = getCurrentWeaponAmmo(equipped);
-        if (curAmmo <= 0) {
-            stopContinuousFire();
-            combatStatusBadge.textContent = "Chargeur vide ! Appuyez sur RELOAD ou clic droit.";
-            return;
-        }
-        triggerShootAction(hitZombie);
-    }, delayMs);
-}
-
-function stopContinuousFire() {
-    isHoldingFire = false;
-    clearInterval(autoFireInterval);
-    autoFireInterval = null;
-}
