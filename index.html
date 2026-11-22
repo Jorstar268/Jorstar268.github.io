@@ -3,20 +3,380 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SDE - Accueil</title>
+    <title>Jonix Nova - Accueil</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <!-- Calque pour l'image ensanglantée (caché au début) -->
     <div id="bg-blood"></div>
-    
+
     <!-- Calque pour la transition au noir -->
     <div id="black-screen"></div>
 
-    <!-- Votre titre -->
-    <h1 id="main-title">SDE</h1>
+    <!-- Transition en 20 rectangles alternés rouge / vert -->
+    <div id="transition-grid" class="hidden"></div>
 
+    <!-- Titre principal -->
+    <h1 id="main-title">GaRaGe DeS EnFeRs</h1>
+
+    <!-- Menu latéral gauche (caché au début et pendant la partie) -->
+    <nav id="side-menu" class="hidden">
+        <div class="wallet">Argent : <span id="player-money">500</span> $</div>
+        <button class="menu-btn play-btn" id="btn-play">JOUER</button>
+        <button class="menu-btn" id="btn-shop">MAGASIN</button>
+        <button class="menu-btn" id="btn-upgrade">AMÉLIORATIONS</button>
+    </nav>
+
+    <!-- Panneau Magasin (armes disponibles à l'achat) -->
+    <div id="panel-shop" class="modal-panel wide-panel hidden">
+        <div class="panel-header">
+            <h2>MAGASIN D'ARMES</h2>
+            <div class="header-right">
+                <span class="panel-wallet">Argent : <strong id="shop-money">500</strong> $</span>
+                <button class="close-btn" data-close="panel-shop">X</button>
+            </div>
+        </div>
+        <div id="shop-list" class="panel-content"></div>
+    </div>
+
+    <!-- Panneau Améliorations (uniquement les armes déjà achetées) -->
+    <div id="panel-upgrade" class="modal-panel wide-panel hidden">
+        <div class="panel-header">
+            <h2>AMÉLIORATIONS</h2>
+            <div class="header-right">
+                <span class="panel-wallet">Argent : <strong id="upgrade-money">500</strong> $</span>
+                <button class="close-btn" data-close="panel-upgrade">X</button>
+            </div>
+        </div>
+        <div id="upgrade-body" class="upgrade-body">
+            <div id="upgrade-list" class="panel-content upgrade-list-col"></div>
+            <div id="upgrade-compare" class="upgrade-compare-col">
+                <div id="compare-placeholder" class="empty-msg">
+                    Cliquez sur une arme pour voir les statistiques actuelles (à gauche) et après amélioration (à droite).
+                </div>
+                <div id="compare-boxes" class="compare-boxes hidden">
+                    <div class="compare-card current-card">
+                        <h3>STATISTIQUES ACTUELLES</h3>
+                        <div id="compare-current-name" class="compare-weapon-title"></div>
+                        <div id="compare-current-stats" class="compare-stats-list"></div>
+                    </div>
+                    <div class="compare-card next-card">
+                        <h3>APRÈS AMÉLIORATION</h3>
+                        <div id="compare-next-name" class="compare-weapon-title"></div>
+                        <div id="compare-next-stats" class="compare-stats-list"></div>
+                        <div id="compare-action-area" class="compare-action-area"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5 cases de difficulté au clic sur Jouer -->
+    <div id="difficulty-screen" class="hidden">
+        <div class="difficulty-box">
+            <h2>CHOISISSEZ LA DIFFICULTÉ</h2>
+            <p id="equipped-weapon-info">Arme équipée : Barre de fer (Niv. 1)</p>
+            <div id="difficulty-grid" class="difficulty-grid"></div>
+            <button class="menu-btn close-diff-btn" id="btn-close-diff">ANNULER</button>
+        </div>
+    </div>
+
+    <!-- ÉCRAN DE COMBAT & BOUTONS STYLE FPS -->
+    <div id="combat-screen" class="hidden">
+        <!-- Zone centrale de visée / zombie / scène 3D -->
+        <div id="combat-view-layer">
+            <div id="combat-status-badge"></div>
+
+            <!-- Cible zombie pour élimination & gains -->
+            <button type="button" id="zombie-target" class="zombie-target" title="Viser / éliminer ce zombie">
+                <span class="zombie-face">🧟</span>
+                <span class="zombie-hp-bar"><span id="zombie-hp-fill"></span></span>
+            </button>
+
+            <!-- Scène 3D : mains + arme -->
+            <div id="fps-3d-wrap" aria-hidden="true"></div>
+            <div class="weapon-3d-hud">
+                <span id="combat-weapon-label">Barre de fer (Niv. 1)</span>
+                <span id="combat-ammo-counter" class="combat-ammo-counter">Munitions : 1 / 1</span>
+            </div>
+        </div>
+
+        <!-- Haut : Stop à gauche / Vagues + Vie au milieu / Argent gagné à droite -->
+        <div class="combat-top-hud">
+            <button id="btn-stop-game" class="combat-stop-btn" title="Pause (Échap)">STOP</button>
+
+            <div class="top-center-stack">
+                <div class="wave-progress-wrapper">
+                    <div id="wave-segments" class="wave-segments"></div>
+                    <div class="boss-icon" title="Boss final">☠ BOSS</div>
+                </div>
+
+                <!-- Barre de vie du joueur sous la zone Stop / progression -->
+                <div class="player-hp-wrapper" title="Vie du joueur">
+                    <span class="player-hp-label">VIE : <strong id="player-hp-text">100 / 100</strong></span>
+                    <div class="player-hp-track">
+                        <span id="player-hp-fill" class="player-hp-fill"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="combat-money-box">
+                Gain partie : +<span id="combat-earned-money">0</span> $
+            </div>
+        </div>
+
+        <!-- Cercle Z/Q/S/D recentré dans le carré bas-gauche -->
+        <div class="move-circle" aria-label="Déplacement">
+            <button type="button" class="move-key key-z" data-move="z" title="Avancer (Z)">Z</button>
+            <button type="button" class="move-key key-s" data-move="s" title="Reculer (S)">S</button>
+            <button type="button" class="move-key key-q" data-move="q" title="Gauche (Q)">Q</button>
+            <button type="button" class="move-key key-d" data-move="d" title="Droite (D)">D</button>
+            <div class="move-center-stick"></div>
+        </div>
+
+        <!-- Boutons d'action centrés dans le carré bas-droit -->
+        <div class="fps-action-cluster">
+            <button type="button" id="btn-combat-switch" class="fps-circle-btn fps-switch-btn" title="Changer d'arme">
+                <span class="fps-icon">⇄</span>
+                <span class="fps-sub">ARME</span>
+            </button>
+            <button type="button" id="btn-combat-heal" class="fps-circle-btn fps-heal-btn" title="Soins">
+                <span class="fps-icon">✚</span>
+                <span class="fps-sub">SOINS (<span id="heal-charges">3</span>)</span>
+            </button>
+            <button type="button" id="btn-combat-reload" class="fps-circle-btn fps-reload-btn" title="Recharger (Clic droit / R)">
+                <span class="fps-icon">↻</span>
+                <span class="fps-sub">RELOAD</span>
+            </button>
+            <button type="button" id="btn-combat-shoot" class="fps-circle-btn fps-shoot-btn" title="Tirer (Clic gauche)">
+                <span class="fps-icon">⌖</span>
+                <span class="fps-sub">TIRER</span>
+            </button>
+        </div>
+
+        <!-- Menu pause au clic sur STOP ou Échap -->
+        <div id="pause-overlay" class="pause-overlay hidden">
+            <div class="pause-box">
+                <h2>PARTIE EN PAUSE</h2>
+                <p>La partie est suspendue. Choisissez de reprendre ou de quitter.</p>
+                <div class="pause-buttons">
+                    <button type="button" id="btn-resume-game" class="pause-btn resume-btn">REPRENDRE LA PARTIE</button>
+                    <button type="button" id="btn-quit-game" class="pause-btn quit-btn">QUITTER LA PARTIE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://esm.sh/three@0.160.0",
+            "three/addons/": "https://esm.sh/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module">
+        import * as THREE from "three";
+        import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+        const container = document.getElementById("fps-3d-wrap");
+        const loader = new GLTFLoader();
+        const modelCache = new Map();
+
+        let scene, camera, renderer, weaponPivot;
+        let currentWeaponModel = null;
+        let activeWeaponId = null;
+        let loadToken = 0;
+
+        const weapon3DConfigs = {
+            barre_fer:            { file: "Bare de Fer.glb",            scale: 1.0, pos: [0.34, -0.28, -0.65], rot: [0.05, -0.35, 0.12] },
+            pistolet_9mm:         { file: "Pistolet.glb",               scale: 1.0, pos: [0.28, -0.22, -0.58], rot: [0.02, -0.08, 0] },
+            revolver_357:         { file: "Revolver.glb",               scale: 1.0, pos: [0.28, -0.22, -0.58], rot: [0.02, -0.08, 0] },
+            fusil_pompe:          { file: "Fusil a pompe.glb",          scale: 1.0, pos: [0.32, -0.26, -0.68], rot: [0.02, -0.08, 0] },
+            pistolet_mitrailleur: { file: "Pistolet-mitrailleur.glb", scale: 1.0, pos: [0.30, -0.24, -0.62], rot: [0.02, -0.08, 0] },
+            fusil_assaut:         { file: "Fusil d'assaut.glb",         scale: 1.0, pos: [0.32, -0.26, -0.70], rot: [0.02, -0.08, 0] },
+            fusil_precision:      { file: "Sniper.glb",                 scale: 1.0, pos: [0.34, -0.27, -0.76], rot: [0.02, -0.08, 0] },
+            mitrailleuse_lourde:  { file: "Sniper lourde.glb",          scale: 1.0, pos: [0.36, -0.29, -0.78], rot: [0.02, -0.08, 0] },
+            lance_roquettes:      { file: "Lance Roquet.glb",           scale: 1.0, pos: [0.36, -0.24, -0.72], rot: [0.02, -0.08, 0] },
+            grenade:              { file: "Grenade.glb",                scale: 1.0, pos: [0.26, -0.22, -0.52], rot: [0.2, -0.2, 0] }
+        };
+
+        const animState = {
+            recoilOffset: 0,
+            recoilPitch: 0,
+            reloadTilt: 0,
+            swayX: 0,
+            swayY: 0,
+            targetSwayX: 0,
+            targetSwayY: 0,
+            isReloading: false,
+            bobTime: 0,
+            isMoving: false
+        };
+
+        function handleResize() {
+            if (!container || !renderer || !camera) return;
+            const width = container.clientWidth || window.innerWidth;
+            const height = container.clientHeight || window.innerHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        }
+
+        function initScene() {
+            if (!container || renderer) return;
+
+            scene = new THREE.Scene();
+
+            const width = container.clientWidth || window.innerWidth;
+            const height = container.clientHeight || window.innerHeight;
+
+            camera = new THREE.PerspectiveCamera(65, width / height, 0.05, 50);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+            renderer.outputColorSpace = THREE.SRGBColorSpace;
+            container.innerHTML = "";
+            container.appendChild(renderer.domElement);
+
+            const ambient = new THREE.AmbientLight(0xffffff, 1.25);
+            scene.add(ambient);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1.8);
+            dirLight.position.set(2, 4, 3);
+            scene.add(dirLight);
+
+            const rimLight = new THREE.DirectionalLight(0xff6666, 0.65);
+            rimLight.position.set(-2, -1, -2);
+            scene.add(rimLight);
+
+            weaponPivot = new THREE.Group();
+            scene.add(weaponPivot);
+
+            window.addEventListener("resize", handleResize);
+            requestAnimationFrame(animate);
+        }
+
+        function normalizeModelToView(root) {
+            const box = new THREE.Box3().setFromObject(root);
+            const size = new THREE.Vector3();
+            const center = new THREE.Vector3();
+            box.getSize(size);
+            box.getCenter(center);
+
+            const maxDim = Math.max(size.x, size.y, size.z) || 1;
+            const targetSize = 0.42;
+            const normScale = targetSize / maxDim;
+
+            root.scale.multiplyScalar(normScale);
+            root.position.sub(center.multiplyScalar(normScale));
+
+            return root;
+        }
+
+        function loadGlbCached(fileName) {
+            if (modelCache.has(fileName)) {
+                return Promise.resolve(modelCache.get(fileName).clone(true));
+            }
+            return new Promise((resolve, reject) => {
+                loader.load(
+                    encodeURI(fileName),
+                    gltf => {
+                        const normalized = normalizeModelToView(gltf.scene);
+                        modelCache.set(fileName, normalized);
+                        resolve(normalized.clone(true));
+                    },
+                    undefined,
+                    err => reject(err)
+                );
+            });
+        }
+
+        async function setWeapon(weaponId) {
+            initScene();
+            handleResize();
+            if (!weaponPivot) return;
+
+            activeWeaponId = weaponId;
+            const token = ++loadToken;
+            const cfg = weapon3DConfigs[weaponId] || weapon3DConfigs.barre_fer;
+
+            if (currentWeaponModel) {
+                weaponPivot.remove(currentWeaponModel);
+                currentWeaponModel = null;
+            }
+
+            weaponPivot.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
+            weaponPivot.rotation.set(cfg.rot[0], cfg.rot[1], cfg.rot[2]);
+
+            try {
+                const model = await loadGlbCached(cfg.file);
+                if (token !== loadToken || activeWeaponId !== weaponId) return;
+
+                model.scale.multiplyScalar(cfg.scale || 1);
+                currentWeaponModel = model;
+                weaponPivot.add(currentWeaponModel);
+            } catch (err) {
+                console.warn(`Impossible de charger le modèle 3D "${cfg.file}" :`, err);
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (!renderer || !scene || !camera || !weaponPivot) return;
+
+            const cfg = weapon3DConfigs[activeWeaponId] || weapon3DConfigs.barre_fer;
+
+            animState.swayX += (animState.targetSwayX - animState.swayX) * 0.14;
+            animState.swayY += (animState.targetSwayY - animState.swayY) * 0.14;
+
+            animState.recoilOffset += (0 - animState.recoilOffset) * 0.22;
+            animState.recoilPitch += (0 - animState.recoilPitch) * 0.22;
+
+            const targetReloadTilt = animState.isReloading ? -0.65 : 0;
+            animState.reloadTilt += (targetReloadTilt - animState.reloadTilt) * 0.18;
+
+            if (animState.isMoving) {
+                animState.bobTime += 0.14;
+            }
+
+            const bobX = animState.isMoving ? Math.cos(animState.bobTime * 0.5) * 0.014 : 0;
+            const bobY = animState.isMoving ? Math.abs(Math.sin(animState.bobTime)) * 0.016 : 0;
+
+            weaponPivot.position.set(
+                cfg.pos[0] + animState.swayX + bobX,
+                cfg.pos[1] - animState.swayY - bobY,
+                cfg.pos[2] + animState.recoilOffset
+            );
+
+            weaponPivot.rotation.set(
+                cfg.rot[0] + animState.recoilPitch + animState.reloadTilt,
+                cfg.rot[1] - animState.swayX * 0.4,
+                cfg.rot[2]
+            );
+
+            renderer.render(scene, camera);
+        }
+
+        window.fps3D = {
+            setWeapon,
+            triggerFire() {
+                animState.recoilOffset = 0.09;
+                animState.recoilPitch = 0.16;
+            },
+            setReloading(active) {
+                animState.isReloading = Boolean(active);
+            },
+            setMoving(active) {
+                animState.isMoving = Boolean(active);
+            },
+            setLook(yaw, pitch) {
+                animState.targetSwayX = Math.max(-0.08, Math.min(0.08, -yaw * 0.0012));
+                animState.targetSwayY = Math.max(-0.06, Math.min(0.06, pitch * 0.0012));
+            }
+        };
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
