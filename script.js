@@ -624,6 +624,8 @@ const zombieHpFill = document.getElementById("zombie-hp-fill");
 let inCombat = false;
 let isPaused = false;
 let isReloading = false;
+let isHoldingFire = false;
+let autoFireInterval = null;
 let earnedInMatch = 0;
 let healCharges = 3;
 let playerMaxHp = 100;
@@ -888,6 +890,39 @@ function triggerMoveDirection(dir, pressed) {
         combatStatusBadge.textContent = `Déplacement : ${labels[dir] || dir}`;
     }
 }
+let isHoldingFire = false;
+let autoFireInterval = null;
+
+function startContinuousFire(hitZombie = false) {
+    if (!inCombat || isPaused || isReloading) return;
+    isHoldingFire = true;
+
+    const equipped = weapons.find(w => w.id === equippedWeaponId) || weapons[0];
+    const s = getStatsAtLevel(equipped, equipped.level);
+    const delayMs = 1000 / Math.max(0.2, Number(s.fireRate) || 1);
+
+    triggerShootAction(hitZombie);
+
+    clearInterval(autoFireInterval);
+    autoFireInterval = setInterval(() => {
+        if (!inCombat || isPaused || isReloading || !isHoldingFire) {
+            stopContinuousFire();
+            return;
+        }
+        if (getCurrentWeaponAmmo(equipped) <= 0) {
+            stopContinuousFire();
+            combatStatusBadge.textContent = "Chargeur vide ! Appuyez sur RELOAD ou clic droit.";
+            return;
+        }
+        triggerShootAction(hitZombie);
+    }, delayMs);
+}
+
+function stopContinuousFire() {
+    isHoldingFire = false;
+    clearInterval(autoFireInterval);
+    autoFireInterval = null;
+}
 
 function togglePauseGame(forcePause = null) {
     if (!inCombat) return;
@@ -899,6 +934,39 @@ function togglePauseGame(forcePause = null) {
     } else {
         combatStatusBadge.textContent = `Reprise — Vague ${currentWave}/${totalWaves}`;
     }
+}
+let isHoldingFire = false;
+let autoFireInterval = null;
+
+function startContinuousFire(hitZombie = false) {
+    if (!inCombat || isPaused || isReloading) return;
+    isHoldingFire = true;
+
+    const equipped = weapons.find(w => w.id === equippedWeaponId) || weapons[0];
+    const s = getStatsAtLevel(equipped, equipped.level);
+    const delayMs = 1000 / Math.max(0.2, Number(s.fireRate) || 1);
+
+    triggerShootAction(hitZombie);
+
+    clearInterval(autoFireInterval);
+    autoFireInterval = setInterval(() => {
+        if (!inCombat || isPaused || isReloading || !isHoldingFire) {
+            stopContinuousFire();
+            return;
+        }
+        if (getCurrentWeaponAmmo(equipped) <= 0) {
+            stopContinuousFire();
+            combatStatusBadge.textContent = "Chargeur vide ! Appuyez sur RELOAD ou clic droit.";
+            return;
+        }
+        triggerShootAction(hitZombie);
+    }, delayMs);
+}
+
+function stopContinuousFire() {
+    isHoldingFire = false;
+    clearInterval(autoFireInterval);
+    autoFireInterval = null;
 }
 
 function quitCombatSession() {
@@ -987,3 +1055,39 @@ document.addEventListener("keyup", e => {
         triggerMoveDirection(key, false);
     }
 });
+function getFireIntervalMs(weapon) {
+    const s = getStatsAtLevel(weapon, weapon.level);
+    const rate = Math.max(0.2, Number(s.fireRate) || 1);
+    return 1000 / rate;
+}
+
+function startContinuousFire(hitZombie = false) {
+    if (!inCombat || isPaused || isReloading) return;
+    isHoldingFire = true;
+
+    triggerShootAction(hitZombie);
+
+    clearInterval(autoFireInterval);
+    const equipped = weapons.find(w => w.id === equippedWeaponId) || weapons[0];
+    const delayMs = getFireIntervalMs(equipped);
+
+    autoFireInterval = setInterval(() => {
+        if (!inCombat || isPaused || isReloading || !isHoldingFire) {
+            stopContinuousFire();
+            return;
+        }
+        const curAmmo = getCurrentWeaponAmmo(equipped);
+        if (curAmmo <= 0) {
+            stopContinuousFire();
+            combatStatusBadge.textContent = "Chargeur vide ! Appuyez sur RELOAD ou clic droit.";
+            return;
+        }
+        triggerShootAction(hitZombie);
+    }, delayMs);
+}
+
+function stopContinuousFire() {
+    isHoldingFire = false;
+    clearInterval(autoFireInterval);
+    autoFireInterval = null;
+}
