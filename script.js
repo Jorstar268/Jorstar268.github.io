@@ -59,6 +59,7 @@ title.addEventListener("click", () => {
 // =========================================================
 
 let money = 5000;
+let highestUnlockedDifficulty = 1;
 
 const weapons = [
     {
@@ -70,22 +71,8 @@ const weapons = [
         level: 1,
         maxLevel: 5,
         upgradeCost: 80,
-        stats: {
-            ammo: 1,
-            reloadTime: 0.4,
-            fireRate: 1.5,
-            dmgClose: 18,
-            dmgMid: 14,
-            dmgFar: 6
-        },
-        step: {
-            ammo: 0,
-            reloadTime: -0.04,
-            fireRate: 0.15,
-            dmgClose: 6,
-            dmgMid: 5,
-            dmgFar: 2
-        }
+        stats: { ammo: 1, reloadTime: 0.4, fireRate: 1.5, dmgClose: 18, dmgMid: 14, dmgFar: 6 },
+        step: { ammo: 0, reloadTime: -0.04, fireRate: 0.15, dmgClose: 6, dmgMid: 5, dmgFar: 2 }
     },
     {
         id: "pistolet_9mm",
@@ -96,22 +83,8 @@ const weapons = [
         level: 1,
         maxLevel: 5,
         upgradeCost: 120,
-        stats: {
-            ammo: 15,
-            reloadTime: 1.3,
-            fireRate: 4.5,
-            dmgClose: 28,
-            dmgMid: 22,
-            dmgFar: 14
-        },
-        step: {
-            ammo: 2,
-            reloadTime: -0.1,
-            fireRate: 0.3,
-            dmgClose: 7,
-            dmgMid: 6,
-            dmgFar: 4
-        }
+        stats: { ammo: 15, reloadTime: 1.3, fireRate: 4.5, dmgClose: 28, dmgMid: 22, dmgFar: 14 },
+        step: { ammo: 2, reloadTime: -0.1, fireRate: 0.3, dmgClose: 7, dmgMid: 6, dmgFar: 4 }
     },
     {
         id: "revolver_357",
@@ -122,22 +95,8 @@ const weapons = [
         level: 1,
         maxLevel: 5,
         upgradeCost: 160,
-        stats: {
-            ammo: 6,
-            reloadTime: 1.7,
-            fireRate: 2.4,
-            dmgClose: 55,
-            dmgMid: 46,
-            dmgFar: 34
-        },
-        step: {
-            ammo: 1,
-            reloadTime: -0.12,
-            fireRate: 0.2,
-            dmgClose: 12,
-            dmgMid: 10,
-            dmgFar: 8
-        }
+        stats: { ammo: 6, reloadTime: 1.7, fireRate: 2.4, dmgClose: 55, dmgMid: 46, dmgFar: 34 },
+        step: { ammo: 1, reloadTime: -0.12, fireRate: 0.2, dmgClose: 12, dmgMid: 10, dmgFar: 8 }
     },
     {
         id: "fusil_pompe",
@@ -148,22 +107,8 @@ const weapons = [
         level: 1,
         maxLevel: 5,
         upgradeCost: 200,
-        stats: {
-            ammo: 8,
-            reloadTime: 2.1,
-            fireRate: 1.3,
-            dmgClose: 95,
-            dmgMid: 52,
-            dmgFar: 18
-        },
-        step: {
-            ammo: 2,
-            reloadTime: -0.15,
-            fireRate: 0.15,
-            dmgClose: 18,
-            dmgMid: 10,
-            dmgFar: 5
-        }
+        stats: { ammo: 8, reloadTime: 2.1, fireRate: 1.3, dmgClose: 95, dmgMid: 52, dmgFar: 18 },
+        step: { ammo: 2, reloadTime: -0.15, fireRate: 0.15, dmgClose: 18, dmgMid: 10, dmgFar: 5 }
     },
     {
         id: "pistolet_mitrailleur",
@@ -174,22 +119,8 @@ const weapons = [
         level: 1,
         maxLevel: 5,
         upgradeCost: 240,
-        stats: {
-            ammo: 30,
-            reloadTime: 1.6,
-            fireRate: 10.5,
-            dmgClose: 24,
-            dmgMid: 18,
-            dmgFar: 10
-        },
-        step: {
-            ammo: 5,
-            reloadTime: -0.1,
-            fireRate: 0.6,
-            dmgClose: 5,
-            dmgMid: 4,
-            dmgFar: 2
-        }
+        stats: { ammo: 30, reloadTime: 1.6, fireRate: 10.5, dmgClose: 24, dmgMid: 18, dmgFar: 10 },
+        step: { ammo: 5, reloadTime: -0.1, fireRate: 0.6, dmgClose: 5, dmgMid: 4, dmgFar: 2 }
     },
     {
         id: "fusil_assaut",
@@ -200,22 +131,8 @@ const weapons = [
         level: 1,
         maxLevel: 5,
         upgradeCost: 280,
-        stats: {
-            ammo: 32,
-            reloadTime: 1.9,
-            fireRate: 8.2,
-            dmgClose: 38,
-            dmgMid: 34,
-            dmgFar: 26
-        },
-        step: {
-            ammo: 4,
-            reloadTime: -0.12,
-            fireRate: 0.4,
-            dmgClose: 8,
-            dmgMid: 7,
-            dmgFar: 6
-        }
+        stats: { ammo: 32, reloadTime: 1.9, fireRate: 8.2, dmgClose: 38, dmgMid: 34, dmgFar: 26 },
+        step: { ammo: 4, reloadTime: -0.12, fireRate: 0.4, dmgClose: 8, dmgMid: 7, dmgFar: 6 }
     },
     {
         id: "fusil_precision",
@@ -226,22 +143,8 @@ const weapons = [
         level: 1,
         maxLevel: 5,
         upgradeCost: 320,
-        stats: {
-            ammo: 5,
-            reloadTime: 2.4,
-            fireRate: 1.1,
-            dmgClose: 110,
-            dmgMid: 135,
-            dmgFar: 165
-        },
-        step: {
-            ammo: 1,
-            reloadTime: -0.15,
-            fireRate: 0.1,
-            dmgClose: 20,
-            dmgMid: 25,
-            dmgFar: 32
-        }
+        stats: { ammo: 5, reloadTime: 2.4, fireRate: 1.1, dmgClose: 110, dmgMid: 135, dmgFar: 165 },
+        step: { ammo: 1, reloadTime: -0.15, fireRate: 0.1, dmgClose: 20, dmgMid: 25, dmgFar: 32 }
     },
     {
         id: "mitrailleuse_lourde",
@@ -252,22 +155,8 @@ const weapons = [
         level: 1,
         maxLevel: 5,
         upgradeCost: 360,
-        stats: {
-            ammo: 100,
-            reloadTime: 3.4,
-            fireRate: 11.5,
-            dmgClose: 44,
-            dmgMid: 39,
-            dmgFar: 29
-        },
-        step: {
-            ammo: 15,
-            reloadTime: -0.2,
-            fireRate: 0.5,
-            dmgClose: 9,
-            dmgMid: 8,
-            dmgFar: 6
-        }
+        stats: { ammo: 100, reloadTime: 3.4, fireRate: 11.5, dmgClose: 44, dmgMid: 39, dmgFar: 29 },
+        step: { ammo: 15, reloadTime: -0.2, fireRate: 0.5, dmgClose: 9, dmgMid: 8, dmgFar: 6 }
     },
     {
         id: "lance_roquettes",
@@ -278,22 +167,8 @@ const weapons = [
         level: 1,
         maxLevel: 5,
         upgradeCost: 420,
-        stats: {
-            ammo: 1,
-            reloadTime: 3.2,
-            fireRate: 0.7,
-            dmgClose: 190,
-            dmgMid: 210,
-            dmgFar: 220
-        },
-        step: {
-            ammo: 0,
-            reloadTime: -0.2,
-            fireRate: 0.08,
-            dmgClose: 35,
-            dmgMid: 40,
-            dmgFar: 45
-        }
+        stats: { ammo: 1, reloadTime: 3.2, fireRate: 0.7, dmgClose: 190, dmgMid: 210, dmgFar: 220 },
+        step: { ammo: 0, reloadTime: -0.2, fireRate: 0.08, dmgClose: 35, dmgMid: 40, dmgFar: 45 }
     },
     {
         id: "grenade",
@@ -304,22 +179,8 @@ const weapons = [
         level: 1,
         maxLevel: 5,
         upgradeCost: 140,
-        stats: {
-            ammo: 3,
-            reloadTime: 1.5,
-            fireRate: 1.2,
-            dmgClose: 140,
-            dmgMid: 95,
-            dmgFar: 30
-        },
-        step: {
-            ammo: 1,
-            reloadTime: -0.1,
-            fireRate: 0.1,
-            dmgClose: 28,
-            dmgMid: 20,
-            dmgFar: 8
-        }
+        stats: { ammo: 3, reloadTime: 1.5, fireRate: 1.2, dmgClose: 140, dmgMid: 95, dmgFar: 30 },
+        step: { ammo: 1, reloadTime: -0.1, fireRate: 0.1, dmgClose: 28, dmgMid: 20, dmgFar: 8 }
     }
 ];
 
@@ -566,11 +427,36 @@ window.upgradeWeapon = function(id) {
     }
 };
 
+function renderDifficultyCases() {
+    const grid = document.getElementById("difficulty-grid");
+    grid.innerHTML = "";
+
+    difficulties.forEach(diff => {
+        const isUnlocked = diff.level <= highestUnlockedDifficulty;
+        const box = document.createElement("div");
+        box.className = `diff-card ${isUnlocked ? "" : "locked"}`;
+        box.innerHTML = `
+            <span class="diff-level">Niveau ${diff.level}</span>
+            <span class="diff-name">${diff.name}</span>
+            <span class="diff-mult">${isUnlocked ? diff.rewardMult : "🔒 Terminez le niveau précédent"}</span>
+        `;
+
+        if (isUnlocked) {
+            box.addEventListener("click", () => {
+                difficultyScreen.classList.add("hidden");
+                startCombatWithRectangles(diff);
+            });
+        }
+
+        grid.appendChild(box);
+    });
+}
+
 document.getElementById("btn-play").addEventListener("click", () => {
     panelShop.classList.add("hidden");
     panelUpgrade.classList.add("hidden");
 
-    const equipped = weapons.find(w => w.id === equippedWeaponId);
+    const equipped = weapons.find(w => w.id === equippedWeaponId) || weapons[0];
     const s = getStatsAtLevel(equipped, equipped.level);
     document.getElementById("equipped-weapon-info").textContent =
         `Arme équipée : ${equipped.name} (Niv. ${equipped.level} • Dégâts proche : ${s.dmgClose})`;
@@ -583,25 +469,6 @@ document.getElementById("btn-close-diff").addEventListener("click", () => {
     difficultyScreen.classList.add("hidden");
 });
 
-function renderDifficultyCases() {
-    const grid = document.getElementById("difficulty-grid");
-    grid.innerHTML = "";
-
-    difficulties.forEach(diff => {
-        const box = document.createElement("div");
-        box.className = "diff-card";
-        box.innerHTML = `
-            <span class="diff-level">Niveau ${diff.level}</span>
-            <span class="diff-name">${diff.name}</span>
-            <span class="diff-mult">${diff.rewardMult}</span>
-        `;
-        box.addEventListener("click", () => {
-            difficultyScreen.classList.add("hidden");
-            startCombatWithRectangles(diff);
-        });
-        grid.appendChild(box);
-    });
-}
 // =========================================================
 // --- TRANSITION 20 RECTANGLES, COMBAT & PAUSE / ZOMBIES ---
 // =========================================================
@@ -617,11 +484,17 @@ const healChargesEl = document.getElementById("heal-charges");
 const playerHpTextEl = document.getElementById("player-hp-text");
 const playerHpFillEl = document.getElementById("player-hp-fill");
 const pauseOverlay = document.getElementById("pause-overlay");
+const deathScreen = document.getElementById("death-screen");
 const zombieTargetBtn = document.getElementById("zombie-target");
 const zombieHpFill = document.getElementById("zombie-hp-fill");
+const zombieTypeBadgeEl = document.getElementById("zombie-type-badge");
+const lowHpBlurEl = document.getElementById("low-hp-blur");
+const btnDeathReplay = document.getElementById("btn-death-replay");
+const btnDeathQuit = document.getElementById("btn-death-quit");
 
 let inCombat = false;
 let isPaused = false;
+let isDead = false;
 let isReloading = false;
 let isHoldingFire = false;
 let autoFireInterval = null;
@@ -638,6 +511,277 @@ let activeDifficulty = null;
 let ammoByWeaponId = {};
 let zombieMaxHp = 60;
 let zombieHp = 60;
+
+const moveKeysPressed = { z: false, q: false, s: false, d: false };
+let moveLoopInterval = null;
+let playerPosX = 0;
+let playerPosZ = 0;
+let walkBobPhase = 0;
+
+const spawnPoints = [
+    { x: -1.35, yOffset: -8 },
+    { x: -1.35, yOffset: 10 },
+    { x: 0, yOffset: -6 },
+    { x: 0, yOffset: 6 },
+    { x: 1.35, yOffset: -8 },
+    { x: 1.35, yOffset: 10 }
+];
+let zombieStartSpawn = spawnPoints[2];
+
+const zombieTypes = {
+    walker: { id: "walker", label: "Rôdeur 2D", hpMult: 1.0, dmgMult: 1.0, chargeSpeed: 0.014, rewardMult: 0.34 },
+    runner: { id: "runner", label: "Coureur 2D", hpMult: 0.72, dmgMult: 0.85, chargeSpeed: 0.025, rewardMult: 0.38 },
+    tank:   { id: "tank",   label: "Tank 2D",   hpMult: 1.85, dmgMult: 1.45, chargeSpeed: 0.009, rewardMult: 0.50 },
+    boss:   { id: "boss",   label: "BOSS 2D",   hpMult: 2.60, dmgMult: 1.75, chargeSpeed: 0.012, rewardMult: 0.80 }
+};
+
+const zombieConfig = {
+    baseHp: 50,
+    hpPerWave: 18,
+    baseDamage: 7,
+    damagePerWave: 2.5,
+    bossWave: 5,
+    baseKillReward: 5
+};
+
+let waveQueue = [];
+let currentZombieType = zombieTypes.walker;
+let zombieChargeLoop = null;
+let zombieChargeProgress = 0;
+let zombieLaneX = 0;
+let isBossWave = false;
+
+function getDifficultyDamageMultiplier() {
+    if (!activeDifficulty) return 1;
+    const multByLevel = { 1: 1.0, 2: 1.25, 3: 1.55, 4: 1.9, 5: 2.35 };
+    return multByLevel[activeDifficulty.level] || 1;
+}
+
+function getDifficultyRewardMultiplier() {
+    if (!activeDifficulty) return 1 / 3;
+    const multByLevel = { 1: 0.33, 2: 0.43, 3: 0.57, 4: 0.73, 5: 1.0 };
+    return multByLevel[activeDifficulty.level] || 0.33;
+}
+
+function getDifficultySpeedMultiplier() {
+    if (!activeDifficulty) return 0.75;
+    const speedByLevel = { 1: 0.55, 2: 0.65, 3: 0.75, 4: 0.88, 5: 1.0 };
+    return speedByLevel[activeDifficulty.level] || 0.75;
+}
+
+function buildWaveQueue(waveNum, diffLevel) {
+    const extraPerHigherWave = Math.max(0, waveNum - 1) * 5;
+
+    if (waveNum >= zombieConfig.bossWave) {
+        const addsCount = Math.min(25, 2 + Math.floor(diffLevel / 2) + extraPerHigherWave);
+        const queue = [];
+        for (let i = 0; i < addsCount; i++) {
+            queue.push(i % 2 === 0 ? zombieTypes.runner : zombieTypes.tank);
+        }
+        queue.push(zombieTypes.boss);
+        return queue;
+    }
+
+    const baseInWave = 2 + waveNum + Math.floor((diffLevel - 1) * 0.8);
+    const totalInWave = baseInWave + extraPerHigherWave;
+    const queue = [];
+
+    for (let i = 0; i < totalInWave; i++) {
+        if (waveNum >= 3 && i === totalInWave - 1) {
+            queue.push(zombieTypes.tank);
+        } else if (waveNum >= 2 && i % 2 === 1) {
+            queue.push(zombieTypes.runner);
+        } else {
+            queue.push(zombieTypes.walker);
+        }
+    }
+    return queue;
+}
+
+function updateZombieBadgeUI() {
+    if (!zombieTypeBadgeEl) return;
+    const remainingIncludingCurrent = waveQueue.length + 1;
+    zombieTypeBadgeEl.textContent = `${currentZombieType.label} • Reste : ${remainingIncludingCurrent}`;
+}
+
+function updateZombieHpUI() {
+    const pct = Math.max(0, Math.min(100, (zombieHp / zombieMaxHp) * 100));
+    zombieHpFill.style.width = `${pct}%`;
+}
+
+function renderZombie2DTransform() {
+    if (!zombieTargetBtn) return;
+    const scale = 0.58 + zombieChargeProgress * 0.82;
+    const baseTop = 44 + zombieStartSpawn.yOffset * (1 - zombieChargeProgress * 0.75);
+    const topPct = baseTop + zombieChargeProgress * 12;
+
+    const startX = zombieStartSpawn.x * 260;
+    const targetX = -playerPosX * 8;
+    const currentX = startX + (targetX - startX) * zombieChargeProgress;
+
+    zombieTargetBtn.style.top = `${topPct.toFixed(1)}%`;
+    zombieTargetBtn.style.left = `calc(50% + ${currentX.toFixed(1)}px)`;
+    zombieTargetBtn.style.transform = `translate(-50%, -50%) scale(${scale.toFixed(3)})`;
+}
+
+function stopZombieChargeLoop() {
+    clearInterval(zombieChargeLoop);
+    zombieChargeLoop = null;
+}
+
+function updatePlayerHpUI() {
+    const clamped = Math.max(0, Math.min(playerMaxHp, playerHp));
+    const ratio = playerMaxHp > 0 ? clamped / playerMaxHp : 0;
+
+    playerHpTextEl.textContent = `${clamped} / ${playerMaxHp}`;
+    playerHpFillEl.style.width = `${(ratio * 100).toFixed(1)}%`;
+
+    if (ratio > 0.55) {
+        playerHpFillEl.style.background = "linear-gradient(90deg, #19a968, #5cf2a6)";
+    } else if (ratio > 0.28) {
+        playerHpFillEl.style.background = "linear-gradient(90deg, #e67e22, #ff4d4d)";
+    } else {
+        playerHpFillEl.style.background = "linear-gradient(90deg, #990000, #ff1a1a)";
+    }
+
+    if (lowHpBlurEl) {
+        const shouldBlur = inCombat && !isPaused && !isDead && clamped > 0 && ratio <= 0.35;
+        lowHpBlurEl.classList.toggle("hidden", !shouldBlur);
+    }
+}
+
+function showDeathScreen() {
+    isDead = true;
+    inCombat = false;
+    isPaused = false;
+    stopZombieChargeLoop();
+    stopContinuousFire();
+    stopMoveLoop();
+    updatePlayerHpUI();
+
+    if (pauseOverlay) pauseOverlay.classList.add("hidden");
+    if (!deathScreen) return;
+
+    deathScreen.classList.remove("hidden");
+    deathScreen.classList.remove("revealed");
+
+    setTimeout(() => {
+        if (isDead && deathScreen) {
+            deathScreen.classList.add("revealed");
+        }
+    }, 350);
+}
+
+function startZombieChargeLoop() {
+    stopZombieChargeLoop();
+
+    zombieChargeLoop = setInterval(() => {
+        if (!inCombat || isPaused || isDead || zombieHp <= 0) return;
+
+        const waveFactor = 1 + (currentWave - 1) * 0.08;
+        zombieChargeProgress += currentZombieType.chargeSpeed * waveFactor * getDifficultySpeedMultiplier();
+
+        zombieLaneX *= 0.96;
+        renderZombie2DTransform();
+
+        if (zombieChargeProgress >= 1) {
+            zombieChargeProgress = 0.25;
+            zombieLaneX = (Math.random() - 0.5) * 1.2;
+
+            const rawDmg = zombieConfig.baseDamage + (currentWave - 1) * zombieConfig.damagePerWave;
+            const dmg = Math.max(1, Math.round(rawDmg * currentZombieType.dmgMult * getDifficultyDamageMultiplier()));
+
+            playerHp = Math.max(0, playerHp - dmg);
+            updatePlayerHpUI();
+
+            zombieTargetBtn.classList.add("attacking");
+            setTimeout(() => zombieTargetBtn.classList.remove("attacking"), 180);
+
+            combatStatusBadge.textContent = `${currentZombieType.label} vous percute (-${dmg} PV) !`;
+
+            if (playerHp <= 0) {
+                showDeathScreen();
+            }
+        }
+    }, 35);
+}
+
+function spawnNextZombieInWave() {
+    stopZombieChargeLoop();
+
+    if (waveQueue.length === 0) {
+        waveQueue = buildWaveQueue(currentWave, activeDifficulty ? activeDifficulty.level : 1);
+    }
+
+    currentZombieType = waveQueue.shift();
+    isBossWave = currentZombieType.id === "boss";
+
+    const rawWaveHp = zombieConfig.baseHp + (currentWave - 1) * zombieConfig.hpPerWave;
+    const diffScale = 0.85 + getDifficultyDamageMultiplier() * 0.15;
+    zombieMaxHp = Math.max(20, Math.round(rawWaveHp * currentZombieType.hpMult * diffScale));
+    zombieHp = zombieMaxHp;
+
+    zombieChargeProgress = 0.02;
+    zombieStartSpawn = spawnPoints[Math.floor(Math.random() * spawnPoints.length)];
+
+    zombieTargetBtn.classList.remove("type-walker", "type-runner", "type-tank", "type-boss", "boss-zombie");
+    zombieTargetBtn.classList.add(`type-${currentZombieType.id}`);
+    if (isBossWave) {
+        zombieTargetBtn.classList.add("boss-zombie");
+    }
+
+    updateZombieBadgeUI();
+    updateZombieHpUI();
+    renderZombie2DTransform();
+    startZombieChargeLoop();
+}
+
+function resetZombieForWave() {
+    waveQueue = buildWaveQueue(currentWave, activeDifficulty ? activeDifficulty.level : 1);
+    spawnNextZombieInWave();
+}
+
+function onZombieKilled() {
+    stopZombieChargeLoop();
+
+    const diffLevel = activeDifficulty ? activeDifficulty.level : 1;
+    const rawReward =
+        diffLevel *
+        zombieConfig.baseKillReward *
+        currentZombieType.rewardMult *
+        getDifficultyRewardMultiplier();
+    const killReward = Math.max(1, Math.round(rawReward));
+
+    earnedInMatch += killReward;
+    combatEarnedMoneyEl.textContent = earnedInMatch;
+
+    if (waveQueue.length > 0) {
+        updateZombieBadgeUI();
+        combatStatusBadge.textContent =
+            `${currentZombieType.label} éliminé (+${killReward} $) — ${waveQueue.length} zombie(s) restant(s)`;
+        spawnNextZombieInWave();
+        return;
+    }
+
+    if (currentWave < totalWaves) {
+        currentWave++;
+        renderWaveSegments(currentWave);
+        combatStatusBadge.textContent =
+            `Vague terminée (+${killReward} $) — Vague ${currentWave}/${totalWaves}`;
+        resetZombieForWave();
+    } else {
+        if (
+            activeDifficulty &&
+            activeDifficulty.level >= highestUnlockedDifficulty &&
+            activeDifficulty.level < difficulties.length
+        ) {
+            highestUnlockedDifficulty = activeDifficulty.level + 1;
+        }
+        combatStatusBadge.textContent =
+            `Boss 2D abattu (+${killReward} $) — Difficulté suivante débloquée !`;
+        resetZombieForWave();
+    }
+}
 
 function initMatchAmmo() {
     ammoByWeaponId = {};
@@ -666,12 +810,6 @@ function updateAmmoUI() {
     combatAmmoCounter.classList.toggle("empty-ammo", cur <= 0);
 }
 
-function updatePlayerHpUI() {
-    const clamped = Math.max(0, Math.min(playerMaxHp, playerHp));
-    playerHpTextEl.textContent = `${clamped} / ${playerMaxHp}`;
-    playerHpFillEl.style.width = `${(clamped / playerMaxHp) * 100}%`;
-}
-
 function build20Rectangles() {
     transitionGrid.innerHTML = "";
     const rects = [];
@@ -684,15 +822,41 @@ function build20Rectangles() {
     return rects;
 }
 
-function resetZombieForWave() {
-    zombieMaxHp = 50 + currentWave * 20;
-    zombieHp = zombieMaxHp;
-    updateZombieHpUI();
+function applyGaragePerspective() {
+    const anyMoving = Object.values(moveKeysPressed).some(Boolean);
+    if (anyMoving && !isPaused && !isDead && inCombat) {
+        walkBobPhase += 0.18;
+    }
+
+    const walkBobY = anyMoving ? Math.abs(Math.sin(walkBobPhase)) * 0.45 : 0;
+
+    const zNorm = Math.max(0, Math.min(1, (playerPosZ + 4) / 20));
+    const zoom = 1.05 + zNorm * 0.55;
+
+    const xNorm = Math.max(-1, Math.min(1, playerPosX / 15));
+    const originXPercent = 50 + xNorm * 20;
+    bgBlood.style.transformOrigin = `${originXPercent.toFixed(1)}% center`;
+
+    const maxShiftX = Math.max(0, ((zoom - 1) / (2 * zoom)) * 100);
+    const maxShiftY = Math.max(0, ((zoom - 1) / (2 * zoom)) * 100);
+
+    const rawShiftX = -xNorm * maxShiftX;
+    const rawShiftY = walkBobY;
+
+    const shiftX = Math.max(-maxShiftX, Math.min(maxShiftX, rawShiftX));
+    const shiftY = Math.max(-maxShiftY, Math.min(maxShiftY, rawShiftY));
+
+    bgBlood.style.transform = `translate(${shiftX.toFixed(2)}%, ${shiftY.toFixed(2)}%) scale(${zoom.toFixed(3)})`;
+    renderZombie2DTransform();
 }
 
-function updateZombieHpUI() {
-    const pct = Math.max(0, Math.min(100, (zombieHp / zombieMaxHp) * 100));
-    zombieHpFill.style.width = `${pct}%`;
+function updateViewLook() {
+    lookYaw = 0;
+    lookPitch = 0;
+    applyGaragePerspective();
+    if (window.fps3D) {
+        window.fps3D.setLook(0, 0);
+    }
 }
 
 function startCombatWithRectangles(diff) {
@@ -700,25 +864,30 @@ function startCombatWithRectangles(diff) {
     panelShop.classList.add("hidden");
     panelUpgrade.classList.add("hidden");
     pauseOverlay.classList.add("hidden");
+    if (deathScreen) deathScreen.classList.add("hidden");
 
     activeDifficulty = diff;
     earnedInMatch = 0;
     healCharges = 3;
+    walkBobPhase = 0;
     playerMaxHp = 100;
     playerHp = 100;
     currentWave = 1;
     lookYaw = 0;
     lookPitch = 0;
+    playerPosX = 0;
+    playerPosZ = 0;
     isPaused = false;
+    isDead = false;
     isReloading = false;
     stopContinuousFire();
+    stopZombieChargeLoop();
 
     initMatchAmmo();
     combatEarnedMoneyEl.textContent = earnedInMatch;
     healChargesEl.textContent = healCharges;
     updatePlayerHpUI();
     renderWaveSegments(currentWave);
-    resetZombieForWave();
     updateViewLook();
 
     const rects = build20Rectangles();
@@ -734,6 +903,7 @@ function startCombatWithRectangles(diff) {
                     combatScreen.classList.remove("hidden");
                     inCombat = true;
                     syncCombatWeaponView();
+                    resetZombieForWave();
                     combatStatusBadge.textContent =
                         `Difficulté ${diff.level} (${diff.name}) — Vague ${currentWave}/${totalWaves}`;
                 }, 220);
@@ -761,30 +931,8 @@ function syncCombatWeaponView() {
     }
 }
 
-function updateViewLook() {
-    combatViewLayer.style.backgroundPosition = `${50 + lookYaw * 0.25}% ${50 + lookPitch * 0.25}%`;
-    if (window.fps3D) {
-        window.fps3D.setLook(lookYaw, lookPitch);
-    }
-}
-
-function onZombieKilled() {
-    const killReward = (activeDifficulty ? activeDifficulty.level : 1) * 15;
-    earnedInMatch += killReward;
-    combatEarnedMoneyEl.textContent = earnedInMatch;
-
-    if (currentWave < totalWaves) {
-        currentWave++;
-        renderWaveSegments(currentWave);
-        combatStatusBadge.textContent = `Zombie éliminé (+${killReward} $) — Vague ${currentWave}/${totalWaves}`;
-    } else {
-        combatStatusBadge.textContent = `Zombie éliminé (+${killReward} $) — Vague Boss atteinte !`;
-    }
-    resetZombieForWave();
-}
-
 function triggerShootAction(hitZombie = false) {
-    if (!inCombat || isPaused || isReloading) return;
+    if (!inCombat || isPaused || isDead || isReloading) return;
 
     const equipped = weapons.find(w => w.id === equippedWeaponId) || weapons[0];
     const currentAmmo = getCurrentWeaponAmmo(equipped);
@@ -805,6 +953,8 @@ function triggerShootAction(hitZombie = false) {
     if (hitZombie) {
         zombieTargetBtn.classList.add("hit-flash");
         zombieHp -= s.dmgClose;
+        zombieChargeProgress = Math.max(0.02, zombieChargeProgress - 0.04);
+        renderZombie2DTransform();
         updateZombieHpUI();
         combatStatusBadge.textContent = `Touché (-${s.dmgClose} PV)`;
         setTimeout(() => zombieTargetBtn.classList.remove("hit-flash"), 120);
@@ -818,7 +968,7 @@ function triggerShootAction(hitZombie = false) {
 }
 
 function triggerReloadAction() {
-    if (!inCombat || isPaused || isReloading) return;
+    if (!inCombat || isPaused || isDead || isReloading) return;
     stopContinuousFire();
     const equipped = weapons.find(w => w.id === equippedWeaponId) || weapons[0];
     const maxAmmo = getCurrentWeaponMaxAmmo(equipped);
@@ -842,14 +992,14 @@ function triggerReloadAction() {
         if (window.fps3D) {
             window.fps3D.setReloading(false);
         }
-        if (inCombat && !isPaused) {
+        if (inCombat && !isPaused && !isDead) {
             combatStatusBadge.textContent = `Chargeur rechargé — Vague ${currentWave}/${totalWaves}`;
         }
     }, 650);
 }
 
 function triggerSwitchWeaponAction() {
-    if (!inCombat || isPaused) return;
+    if (!inCombat || isPaused || isDead) return;
     const wasHolding = isHoldingFire;
     stopContinuousFire();
     const owned = weapons.filter(w => w.owned);
@@ -868,7 +1018,7 @@ function triggerSwitchWeaponAction() {
 }
 
 function triggerHealAction() {
-    if (!inCombat || isPaused) return;
+    if (!inCombat || isPaused || isDead) return;
     if (healCharges > 0 && playerHp < playerMaxHp) {
         healCharges--;
         playerHp = Math.min(playerMaxHp, playerHp + 35);
@@ -881,15 +1031,11 @@ function triggerHealAction() {
         combatStatusBadge.textContent = "Vie déjà au maximum";
     }
 }
-const moveKeysPressed = { z: false, q: false, s: false, d: false };
-let moveLoopInterval = null;
-let playerPosX = 0;
-let playerPosZ = 0;
 
 function updatePlayerMovementStep() {
-    if (!inCombat || isPaused) return;
+    if (!inCombat || isPaused || isDead) return;
 
-    const speed = 0.22;
+    const speed = 0.32;
     let dx = 0;
     let dz = 0;
 
@@ -900,20 +1046,16 @@ function updatePlayerMovementStep() {
 
     if (dx === 0 && dz === 0) return;
 
-    // Normalise les déplacements en diagonale pour ne pas aller plus vite
     if (dx !== 0 && dz !== 0) {
         const inv = 1 / Math.SQRT2;
         dx *= inv;
         dz *= inv;
     }
 
-    playerPosX += dx;
-    playerPosZ += dz;
+    playerPosX = Math.max(-15, Math.min(15, playerPosX + dx));
+    playerPosZ = Math.max(-4, Math.min(16, playerPosZ + dz));
 
-    // Déplace visuellement l'arrière-plan de la zone de combat selon la position
-    const bgX = 50 + lookYaw * 0.25 - playerPosX * 1.4;
-    const bgY = 50 + lookPitch * 0.25 + playerPosZ * 1.1;
-    combatViewLayer.style.backgroundPosition = `${bgX}% ${bgY}%`;
+    applyGaragePerspective();
 
     if (window.fps3D && typeof window.fps3D.setMoveOffset === "function") {
         window.fps3D.setMoveOffset(playerPosX, playerPosZ);
@@ -928,10 +1070,13 @@ function startMoveLoop() {
 function stopMoveLoop() {
     clearInterval(moveLoopInterval);
     moveLoopInterval = null;
-}function triggerMoveDirection(dir, pressed) {
+    applyGaragePerspective();
+}
+
+function triggerMoveDirection(dir, pressed) {
     if (!["z", "q", "s", "d"].includes(dir)) return;
 
-    if (!inCombat || isPaused) {
+    if (!inCombat || isPaused || isDead) {
         moveKeysPressed[dir] = false;
         const btn = document.querySelector(`.move-key[data-move="${dir}"]`);
         if (btn) btn.classList.remove("pressed");
@@ -969,17 +1114,18 @@ function getFireIntervalMs(weapon) {
 }
 
 function startContinuousFire(hitZombie = false) {
-    if (!inCombat || isPaused || isReloading) return;
+    if (!inCombat || isPaused || isDead || isReloading) return;
+    const targetIsZombie = Boolean(hitZombie);
     isHoldingFire = true;
 
     const equipped = weapons.find(w => w.id === equippedWeaponId) || weapons[0];
     const delayMs = getFireIntervalMs(equipped);
 
-    triggerShootAction(hitZombie);
+    triggerShootAction(targetIsZombie);
 
     clearInterval(autoFireInterval);
     autoFireInterval = setInterval(() => {
-        if (!inCombat || isPaused || isReloading || !isHoldingFire) {
+        if (!inCombat || isPaused || isDead || isReloading || !isHoldingFire) {
             stopContinuousFire();
             return;
         }
@@ -989,7 +1135,7 @@ function startContinuousFire(hitZombie = false) {
             combatStatusBadge.textContent = "Chargeur vide ! Appuyez sur RELOAD ou clic droit.";
             return;
         }
-        triggerShootAction(hitZombie);
+        triggerShootAction(targetIsZombie);
     }, delayMs);
 }
 
@@ -1003,35 +1149,70 @@ function togglePauseGame(forcePause = null) {
     stopMoveLoop();
     moveKeysPressed.z = moveKeysPressed.q = moveKeysPressed.s = moveKeysPressed.d = false;
     stopContinuousFire();
-    if (!inCombat) return;
+    if (!inCombat || isDead) return;
     const nextState = forcePause !== null ? forcePause : !isPaused;
     isPaused = nextState;
+    updatePlayerHpUI();
     pauseOverlay.classList.toggle("hidden", !isPaused);
     if (isPaused) {
+        stopZombieChargeLoop();
         combatStatusBadge.textContent = "Partie en pause";
     } else {
+        startZombieChargeLoop();
         combatStatusBadge.textContent = `Reprise — Vague ${currentWave}/${totalWaves}`;
     }
 }
 
 function quitCombatSession() {
     stopContinuousFire();
-    if (!inCombat && combatScreen.classList.contains("hidden")) return;
+    stopZombieChargeLoop();
+    if (!inCombat && !isDead && combatScreen.classList.contains("hidden")) return;
+    playerPosX = 0;
+    playerPosZ = 0;
+    walkBobPhase = 0;
+    zombieChargeProgress = 0;
+    bgBlood.style.transform = "translate(0%, 0%) scale(1)";
     inCombat = false;
     isPaused = false;
+    isDead = false;
     isReloading = false;
+    updatePlayerHpUI();
     pauseOverlay.classList.add("hidden");
+    if (deathScreen) {
+        deathScreen.classList.add("hidden");
+        deathScreen.classList.remove("revealed");
+    }
     combatScreen.classList.add("hidden");
 
     money += earnedInMatch;
     earnedInMatch = 0;
     combatEarnedMoneyEl.textContent = 0;
     updateMoneyUI();
+    renderDifficultyCases();
 
     sideMenu.classList.remove("hidden");
 }
 
-// Boutons HUD de combat & pause
+function replayAfterDeath() {
+    const diffToReplay = activeDifficulty || difficulties[0];
+    if (deathScreen) {
+        deathScreen.classList.add("hidden");
+        deathScreen.classList.remove("revealed");
+    }
+    money += earnedInMatch;
+    earnedInMatch = 0;
+    combatEarnedMoneyEl.textContent = 0;
+    updateMoneyUI();
+    startCombatWithRectangles(diffToReplay);
+}
+
+if (btnDeathReplay) {
+    btnDeathReplay.addEventListener("click", replayAfterDeath);
+}
+if (btnDeathQuit) {
+    btnDeathQuit.addEventListener("click", quitCombatSession);
+}
+
 document.getElementById("btn-stop-game").addEventListener("click", () => togglePauseGame(true));
 document.getElementById("btn-resume-game").addEventListener("click", () => togglePauseGame(false));
 document.getElementById("btn-quit-game").addEventListener("click", quitCombatSession);
@@ -1068,16 +1249,8 @@ document.querySelectorAll(".move-key").forEach(btn => {
     btn.addEventListener("touchend", () => triggerMoveDirection(dir, false));
 });
 
-// Souris & clics en combat : mouvement de visée, clic gauche = tirer en continu, clic droit = recharger
-combatViewLayer.addEventListener("mousemove", e => {
-    if (!inCombat || isPaused) return;
-    lookYaw += e.movementX * 0.18;
-    lookPitch = Math.max(-60, Math.min(60, lookPitch + e.movementY * 0.18));
-    updateViewLook();
-});
-
 combatViewLayer.addEventListener("mousedown", e => {
-    if (!inCombat || isPaused) return;
+    if (!inCombat || isPaused || isDead) return;
     if (e.button === 0) {
         startContinuousFire(false);
     } else if (e.button === 2) {
@@ -1085,19 +1258,12 @@ combatViewLayer.addEventListener("mousedown", e => {
     }
 });
 
-window.addEventListener("mouseup", e => {
-    if (e.button === 0) stopContinuousFire();
-});
-window.addEventListener("touchend", stopContinuousFire);
-window.addEventListener("blur", stopContinuousFire);
-
 combatViewLayer.addEventListener("contextmenu", e => {
     if (inCombat) e.preventDefault();
 });
 
-// Clavier Z / Q / S / D, R et Échap
 document.addEventListener("keydown", e => {
-    if (!inCombat) return;
+    if (!inCombat || isDead) return;
     const key = e.key.toLowerCase();
     if (key === "escape") {
         togglePauseGame();
@@ -1115,6 +1281,7 @@ document.addEventListener("keyup", e => {
         triggerMoveDirection(key, false);
     }
 });
+
 window.addEventListener("mouseup", e => {
     if (e.button === 0) {
         stopContinuousFire();

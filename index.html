@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jonix Nova - Accueil</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style_3.css">
 </head>
 <body>
 
@@ -84,23 +84,36 @@
 
     <!-- ÉCRAN DE COMBAT & BOUTONS STYLE FPS -->
     <div id="combat-screen" class="hidden">
-        <!-- Zone centrale de visée / zombie / scène 3D -->
+        <!-- Zone centrale de visée / zombie 2D / scène 3D -->
         <div id="combat-view-layer">
             <div id="combat-status-badge"></div>
 
-            <!-- Cible zombie pour élimination & gains -->
+            <!-- Cible zombie 2D qui fonce vers le joueur -->
             <button type="button" id="zombie-target" class="zombie-target" title="Viser / éliminer ce zombie">
-                <span class="zombie-face">🧟</span>
+                <span id="zombie-type-badge" class="zombie-type-badge">Rôdeur 2D • Reste : 1</span>
+                <svg class="zombie-2d-svg" viewBox="0 0 90 110" aria-hidden="true">
+                    <circle class="z-head" cx="45" cy="20" r="12" />
+                    <circle class="z-eye" cx="41" cy="18" r="2.2" />
+                    <circle class="z-eye" cx="49" cy="18" r="2.2" />
+                    <line class="z-body" x1="45" y1="32" x2="45" y2="68" />
+                    <line class="z-arm-l" x1="45" y1="42" x2="22" y2="54" />
+                    <line class="z-arm-r" x1="45" y1="42" x2="68" y2="54" />
+                    <line class="z-leg-l" x1="45" y1="68" x2="27" y2="98" />
+                    <line class="z-leg-r" x1="45" y1="68" x2="63" y2="98" />
+                </svg>
                 <span class="zombie-hp-bar"><span id="zombie-hp-fill"></span></span>
             </button>
 
-            <!-- Scène 3D : mains + arme -->
+            <!-- Scène 3D : arme -->
             <div id="fps-3d-wrap" aria-hidden="true"></div>
             <div class="weapon-3d-hud">
                 <span id="combat-weapon-label">Barre de fer (Niv. 1)</span>
                 <span id="combat-ammo-counter" class="combat-ammo-counter">Munitions : 1 / 1</span>
             </div>
         </div>
+
+        <!-- Effet flou rouge pulsant quand la vie est basse -->
+        <div id="low-hp-blur" class="low-hp-blur hidden" aria-hidden="true"></div>
 
         <!-- Haut : Stop à gauche / Vagues + Vie au milieu / Argent gagné à droite -->
         <div class="combat-top-hud">
@@ -167,6 +180,23 @@
             </div>
         </div>
     </div>
+
+    <!-- Écran de mort : transition noire -> glisse avec traînée rouge -> fond noir clignotant -->
+    <div id="death-screen" class="death-screen hidden" role="dialog" aria-modal="true">
+        <div id="death-black-curtain" class="death-black-curtain"></div>
+        <div id="death-content" class="death-content">
+            <div class="death-title-wrap">
+                <h2 id="death-title" class="death-title">VOUS ÊTES MORT</h2>
+                <span class="death-red-trail" aria-hidden="true"></span>
+            </div>
+            <p class="death-sub">Les zombies ont envahi le garage.</p>
+            <div class="death-actions">
+                <button type="button" id="btn-death-replay" class="death-btn replay-btn">REJOUER</button>
+                <button type="button" id="btn-death-quit" class="death-btn quit-death-btn">QUITTER</button>
+            </div>
+        </div>
+    </div>
+
     <script type="importmap">
     {
         "imports": {
@@ -183,21 +213,22 @@
         const loader = new GLTFLoader();
         const modelCache = new Map();
 
-       let scene, camera, renderer, weaponPivot, weaponModelPivot;
+        let scene, camera, renderer, weaponPivot, weaponModelPivot;
         let currentWeaponModel = null;
         let activeWeaponId = null;
         let loadToken = 0;
+
         const weapon3DConfigs = {
-            barre_fer:            { file: "Bare de Fer.glb",            scale: 1.35, pos: [0.05, -0.20, -0.58], rot: [0.12, Math.PI , 0.08] },
-            pistolet_9mm:         { file: "Pistolet.glb",               scale: 0.9, pos: [0.05, -0.20, -0.58], rot: [0.0, Math.PI/2 , 0.0] },
-            revolver_357:         { file: "Revolver.glb",               scale: 1.05, pos: [0.05, -0.20, -0.56], rot: [0.05, Math.PI , 0.0] },
-            fusil_pompe:          { file: "Fusil a pompe.glb",          scale: 1.15, pos: [0.10, -0.13, -0.52], rot: [0.0, Math.PI /2 , 0.0] },
-            pistolet_mitrailleur: { file: "Pistolet-mitrailleur.glb", scale: 1.15, pos: [0.10, -0.20, -0.55], rot: [0.0, Math.PI/2 , 0.0] },
-            fusil_assaut:         { file: "Fusil d'assaut.glb",         scale: 1.15, pos: [0.10, -0.20, -0.54], rot: [0.0, Math.PI /2, 0.0] },
-            fusil_precision:      { file: "Sniper.glb",                 scale: 1.20, pos: [0.10, -0.20, -0.55], rot: [0.0, Math.PI /2, 0.0] },
-            mitrailleuse_lourde:  { file: "Sniper lourde.glb",          scale: 1.20, pos: [0.10, -0.20, -0.56], rot: [0.0,Math.PI/2, 0.0] },
+            barre_fer:            { file: "Bare de Fer.glb",            scale: 1.35, pos: [0.05, -0.20, -0.58], rot: [0.12, Math.PI, 0.08] },
+            pistolet_9mm:         { file: "Pistolet.glb",               scale: 0.90, pos: [0.05, -0.20, -0.58], rot: [0.0, Math.PI / 2, 0.0] },
+            revolver_357:         { file: "Revolver.glb",               scale: 1.05, pos: [0.05, -0.20, -0.56], rot: [0.05, Math.PI, 0.0] },
+            fusil_pompe:          { file: "Fusil a pompe.glb",          scale: 1.15, pos: [0.10, -0.13, -0.52], rot: [0.0, Math.PI / 2, 0.0] },
+            pistolet_mitrailleur: { file: "Pistolet-mitrailleur.glb", scale: 1.15, pos: [0.10, -0.20, -0.55], rot: [0.0, Math.PI / 2, 0.0] },
+            fusil_assaut:         { file: "Fusil d'assaut.glb",         scale: 1.15, pos: [0.10, -0.20, -0.54], rot: [0.0, Math.PI / 2, 0.0] },
+            fusil_precision:      { file: "Sniper.glb",                 scale: 1.20, pos: [0.10, -0.20, -0.55], rot: [0.0, Math.PI / 2, 0.0] },
+            mitrailleuse_lourde:  { file: "Sniper lourde.glb",          scale: 1.20, pos: [0.10, -0.20, -0.56], rot: [0.0, Math.PI / 2, 0.0] },
             lance_roquettes:      { file: "Lance Roquet.glb",           scale: 1.15, pos: [0.10, -0.13, -0.58], rot: [0.0, 0, 0.0] },
-            grenade:              { file: "Grenade.glb",                scale: 0.6,  pos: [0.10, -0.24, -0.62], rot: [0.0, Math.PI, 0.0] }
+            grenade:              { file: "Grenade.glb",                scale: 0.60, pos: [0.10, -0.24, -0.62], rot: [0.0, Math.PI, 0.0] }
         };
 
         const animState = {
@@ -251,14 +282,12 @@
             scene.add(rimLight);
 
             weaponPivot = new THREE.Group();
+            weaponModelPivot = new THREE.Group();
+            weaponPivot.add(weaponModelPivot);
             scene.add(weaponPivot);
 
             window.addEventListener("resize", handleResize);
             requestAnimationFrame(animate);
-            weaponPivot = new THREE.Group();
-            weaponModelPivot = new THREE.Group();
-            weaponPivot.add(weaponModelPivot);
-            scene.add(weaponPivot);
         }
 
         function normalizeModelToView(root) {
@@ -299,33 +328,6 @@
         async function setWeapon(weaponId) {
             initScene();
             handleResize();
-            if (!weaponPivot) return;
-
-            activeWeaponId = weaponId;
-            const token = ++loadToken;
-            const cfg = weapon3DConfigs[weaponId] || weapon3DConfigs.barre_fer;
-
-            if (currentWeaponModel) {
-                weaponPivot.remove(currentWeaponModel);
-                currentWeaponModel = null;
-            }
-
-            weaponPivot.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
-            weaponPivot.rotation.set(cfg.rot[0], cfg.rot[1], cfg.rot[2]);
-
-            try {
-                const model = await loadGlbCached(cfg.file);
-                if (token !== loadToken || activeWeaponId !== weaponId) return;
-
-                model.scale.multiplyScalar(cfg.scale || 1);
-                currentWeaponModel = model;
-                weaponPivot.add(currentWeaponModel);
-            } catch (err) {
-                console.warn(`Impossible de charger le modèle 3D "${cfg.file}" :`, err);
-            }
-            async function setWeapon(weaponId) {
-            initScene();
-            handleResize();
             if (!weaponPivot || !weaponModelPivot) return;
 
             activeWeaponId = weaponId;
@@ -338,7 +340,7 @@
             }
 
             weaponPivot.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
-            weaponModelPivot.rotation.set(cfg.rot[0], cfg.rot[1], cfg.rot[2]);
+            weaponPivot.rotation.set(cfg.rot[0], cfg.rot[1], cfg.rot[2]);
             weaponModelPivot.scale.setScalar(cfg.scale || 1);
 
             try {
@@ -350,7 +352,6 @@
             } catch (err) {
                 console.warn(`Impossible de charger le modèle 3D "${cfg.file}" :`, err);
             }
-        }
         }
 
         function animate() {
