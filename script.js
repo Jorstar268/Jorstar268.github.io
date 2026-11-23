@@ -491,7 +491,12 @@ const zombieTypeBadgeEl = document.getElementById("zombie-type-badge");
 const lowHpBlurEl = document.getElementById("low-hp-blur");
 const btnDeathReplay = document.getElementById("btn-death-replay");
 const btnDeathQuit = document.getElementById("btn-death-quit");
+const victoryScreen = document.getElementById("victory-screen");
+const victorySummaryEl = document.getElementById("victory-summary");
+const btnVictoryReplay = document.getElementById("btn-victory-replay");
+const btnVictoryMenu = document.getElementById("btn-victory-menu");
 
+let isVictory = false;
 let inCombat = false;
 let isPaused = false;
 let isDead = false;
@@ -777,12 +782,16 @@ function onZombieKilled() {
         ) {
             highestUnlockedDifficulty = activeDifficulty.level + 1;
         }
-        combatStatusBadge.textContent =
-            `Boss 2D abattu (+${killReward} $) — Difficulté suivante débloquée !`;
-        resetZombieForWave();
+
+        const totalMatchGain = earnedInMatch;
+        money += earnedInMatch;
+        earnedInMatch = 0;
+        combatEarnedMoneyEl.textContent = 0;
+        updateMoneyUI();
+
+        showVictoryScreen(totalMatchGain);
     }
 }
-
 function initMatchAmmo() {
     ammoByWeaponId = {};
     weapons.forEach(w => {
@@ -930,10 +939,10 @@ function syncCombatWeaponView() {
         window.fps3D.setWeapon(equipped.id);
     }
 }
-
 function triggerShootAction(hitZombie = false) {
-    if (!inCombat || isPaused || isDead || isReloading) return;
+    if (!inCombat || isPaused || isDead || isVictory || isReloading) return;
 
+    const isDirectZombieHit = hitZombie === true;
     const equipped = weapons.find(w => w.id === equippedWeaponId) || weapons[0];
     const currentAmmo = getCurrentWeaponAmmo(equipped);
 
@@ -950,7 +959,7 @@ function triggerShootAction(hitZombie = false) {
         window.fps3D.triggerFire();
     }
 
-    if (hitZombie) {
+    if (isDirectZombieHit && zombieHp > 0) {
         zombieTargetBtn.classList.add("hit-flash");
         zombieHp -= s.dmgClose;
         zombieChargeProgress = Math.max(0.02, zombieChargeProgress - 0.04);
@@ -963,7 +972,7 @@ function triggerShootAction(hitZombie = false) {
             onZombieKilled();
         }
     } else {
-        combatStatusBadge.textContent = `Tir (${equipped.name}) — ${ammoByWeaponId[equipped.id]} munition(s) restante(s)`;
+        combatStatusBadge.textContent = `Tir dans le vide (${equipped.name}) — ${ammoByWeaponId[equipped.id]} munition(s) restante(s)`;
     }
 }
 
@@ -1112,20 +1121,20 @@ function getFireIntervalMs(weapon) {
     const rate = Math.max(0.2, Number(s.fireRate) || 1);
     return 1000 / rate;
 }
-
 function startContinuousFire(hitZombie = false) {
-    if (!inCombat || isPaused || isDead || isReloading) return;
-    const targetIsZombie = Boolean(hitZombie);
+    if (!inCombat || isPaused || isDead || isVictory || isReloading) return;
+
+    const lockedHitTarget = hitZombie === true;
     isHoldingFire = true;
 
     const equipped = weapons.find(w => w.id === equippedWeaponId) || weapons[0];
     const delayMs = getFireIntervalMs(equipped);
 
-    triggerShootAction(targetIsZombie);
+    triggerShootAction(lockedHitTarget);
 
     clearInterval(autoFireInterval);
     autoFireInterval = setInterval(() => {
-        if (!inCombat || isPaused || isDead || isReloading || !isHoldingFire) {
+        if (!inCombat || isPaused || isDead || isVictory || isReloading || !isHoldingFire) {
             stopContinuousFire();
             return;
         }
@@ -1135,7 +1144,7 @@ function startContinuousFire(hitZombie = false) {
             combatStatusBadge.textContent = "Chargeur vide ! Appuyez sur RELOAD ou clic droit.";
             return;
         }
-        triggerShootAction(targetIsZombie);
+        triggerShootAction(lockedHitTarget);
     }, delayMs);
 }
 
@@ -1299,3 +1308,50 @@ window.addEventListener("blur", () => {
     stopMoveLoop();
     ["z", "q", "s", "d"].forEach(dir => triggerMoveDirection(dir, false));
 });
+function showVictoryScreen(finalEarnedAmount) {
+    isVictory = true;
+    inCombat = false;
+    isPaused = false;
+    stopZombieChargeLoop();
+    stopContinuousFire();
+    stopMoveLoop();
+
+    if (lowHpBlurEl) lowHpBlurEl.classList.add("hidden");
+    if (pauseOverlay) pauseOverlay.classList.add("hidden");
+    if (deathScreen) deathScreen.classList.add("hidden");
+
+    const diffLabel = activeDifficulty ? `Niveau ${activeDifficulty.level} (${activeDifficulty.name})` : "Partie";
+    if (victorySummaryEl) {
+        victorySummaryEl.textContent =
+            `${diffLabel} terminé ! Vous avez gagné +${finalEarnedAmount} $.`;
+    }
+    if (victoryScreen) {
+        victoryScreen.classList.remove("hidden");
+    }
+}
+
+function replayAfterVictory() {
+    const diffToReplay = activeDifficulty || difficulties[0];
+    if (victoryScreen) {
+        victoryScreen.classList.add("hidden");
+    }
+    isVictory = false;
+    startCombatWithRectangles(diffToReplay);
+}
+
+function returnToMenuFromVictory() {
+    if (victoryScreen) {
+        victoryScreen.classList.add("hidden");
+    }
+    isVictory = false;
+    combatScreen.classList.add("hidden");
+    renderDifficultyCases();
+    sideMenu.classList.remove("hidden");
+}
+
+if (btnVictoryReplay) {
+    btnVictoryReplay.addEventListener("click", replayAfterVictory);
+}
+if (btnVictoryMenu) {
+    btnVictoryMenu.addEventListener("click", returnToMenuFromVictory);
+}

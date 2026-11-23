@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jonix Nova - Accueil</title>
-    <link rel="stylesheet" href="style_3.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -193,6 +193,17 @@
             <div class="death-actions">
                 <button type="button" id="btn-death-replay" class="death-btn replay-btn">REJOUER</button>
                 <button type="button" id="btn-death-quit" class="death-btn quit-death-btn">QUITTER</button>
+            </div>
+        </div>
+    </div>
+    <!-- Écran de victoire : affiché lorsque le boss de la vague finale est éliminé -->
+    <div id="victory-screen" class="victory-screen hidden" role="dialog" aria-modal="true">
+        <div class="victory-box">
+            <h2 class="victory-title">VICTOIRE !</h2>
+            <p id="victory-summary" class="victory-sub">Vous avez survécu à toutes les vagues et abattu le boss.</p>
+            <div class="victory-actions">
+                <button type="button" id="btn-victory-replay" class="victory-btn replay-victory-btn">REJOUER</button>
+                <button type="button" id="btn-victory-menu" class="victory-btn menu-victory-btn">RETOUR AU MENU</button>
             </div>
         </div>
     </div>
