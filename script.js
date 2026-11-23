@@ -58,7 +58,7 @@ title.addEventListener("click", () => {
 // --- LOGIQUE : MAGASIN, AMÉLIORATIONS & 5 DIFFICULTÉS ---
 // =========================================================
 
-let money = 5000;
+let money = 200;
 let highestUnlockedDifficulty = 1;
 
 const weapons = [
